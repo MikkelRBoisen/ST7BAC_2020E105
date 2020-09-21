@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "ST7BAC_2020E105"
