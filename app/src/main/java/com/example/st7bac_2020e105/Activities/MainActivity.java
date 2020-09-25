@@ -1,8 +1,10 @@
-package com.example.st7bac_2020e105;
+package com.example.st7bac_2020e105.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.st7bac_2020e105.R;
 
 public class MainActivity extends AppCompatActivity {
 
