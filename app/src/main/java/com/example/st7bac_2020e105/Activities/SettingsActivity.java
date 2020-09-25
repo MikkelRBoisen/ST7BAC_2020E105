@@ -1,10 +1,12 @@
-package com.example.st7bac_2020e105;
+package com.example.st7bac_2020e105.Activities;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.example.st7bac_2020e105.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
