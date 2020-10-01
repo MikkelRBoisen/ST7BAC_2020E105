@@ -3,55 +3,79 @@ package com.example.st7bac_2020e105.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SeekBar;
 
+import com.example.st7bac_2020e105.Alarm;
 import com.example.st7bac_2020e105.R;
+import com.example.st7bac_2020e105.Service;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //https://stackoverflow.com/questions/10134338/using-seekbar-to-control-volume-in-android
+    //Inspiration fra:
+    //https://www.youtube.com/watch?v=KAx5OAld8Hg&t=301s&ab_channel=WithSam
 
-    private SeekBar volume = null;
+
+    //Test knap:
+    //Tilføjet "Implements View.OnClickListenter" - kan fjernes når knappen fjernes..
+    Button testLydKnap;
+
+
+
+    //Adjusting volume
+    SeekBar volume;
+    AudioManager audioManager;
+
     SeekBar radius;
-    private AudioManager audioManager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        controlVolume();
+        // TEST LYD MED KNAP
+        testLydKnap = (Button)findViewById(R.id.btnTestSound);
+        testLydKnap.setOnClickListener(this);
+        //
+
+
+
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+
+        int MAX_VOLUME = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+
+        volume = (SeekBar)findViewById(R.id.seekBar_volume_settingsactivity);
+        volume.setMax(MAX_VOLUME);
+        volume.setProgress(currentVolume);
+
+        volume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {            }
+        });
+
     }
 
-    private void controlVolume()
-    {
-        try {
-            volume = (SeekBar)findViewById(R.id.seekBar_volume_settingsactivity);
-            audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            volume.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
-            volume.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
-
-            volume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                }
-            });
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+    //TEST LYD MED KNAP OG SERVICE
+    @Override
+    public void onClick(View v) {
+        if (v == testLydKnap)
+        startService(new Intent(this, Service.class));
+        //PlaySound();
     }
 }
