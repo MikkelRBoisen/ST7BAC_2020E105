@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsActivity">
+    tools:context=".Activities.SettingsActivity">
 
     <TextView
         android:id="@+id/textView_volume_settingsactivity"
@@ -77,7 +77,7 @@
         app:layout_constraintBottom_toTopOf="@+id/seekBar_volume_settingsactivity"
         app:layout_constraintEnd_toStartOf="@+id/textView_volume_settingsactivity"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/volumeIcon" />
+        app:srcCompat="@drawable/sound_icon" />
 
     <ImageView
         android:id="@+id/imageRadius"
@@ -89,6 +89,6 @@
         app:layout_constraintBottom_toTopOf="@+id/seekBar_radius_settingsactivity"
         app:layout_constraintEnd_toStartOf="@+id/textView_radius_settingsactivity"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/radiusIcon" />
+        app:srcCompat="@drawable/radius_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
