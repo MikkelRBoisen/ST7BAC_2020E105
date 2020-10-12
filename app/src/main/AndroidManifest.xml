@@ -4,17 +4,17 @@
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.MapsActivity"></activity>
+        <activity android:name=".Activities.EmergencyVehicleLocationActivity" />
+        <activity android:name=".Activities.MapsActivity" />
         <activity android:name=".Activities.SettingsActivity" />
         <activity android:name=".Activities.LocationActivity" />
         <activity android:name=".Activities.LoginActivity" />
@@ -25,8 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".Service"/>
 
+        <service android:name=".Service" />
     </application>
 
 </manifest>
