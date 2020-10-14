@@ -31,16 +31,14 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     Button testActivity;
 
 
-    //Service
-    private Service myService;
-    private ServiceConnection myConnection;
-    boolean bound = false;
+    Button safeButton;
 
     //Adjusting volume
     SeekBar volume;
     AudioManager audioManager;
 
     SeekBar radius;
+    int radiusValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +54,17 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         testActivity = (Button)findViewById(R.id.btnTestNewActivity);
         testActivity.setOnClickListener(this);
         //
+
+        //Safe changes button
+        safeButton = (Button)findViewById(R.id.btn_safe_settingsactivity);
+        safeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent radiusIntent =new Intent(SettingsActivity.this, MapsActivity.class);
+                radiusIntent.putExtra("radius",radiusValue);
+                startActivity(radiusIntent);
+            }
+        });
 
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
@@ -83,12 +92,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
 
         radius = (SeekBar)findViewById(R.id.seekBar_radius_settingsactivity);
+        radius.setMax(5000);
         radius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            Intent radiusIntent =new Intent(SettingsActivity.this, Service.class);
-            radiusIntent.putExtra("radius",progress);
-            bindService(radiusIntent, myConnection, BIND_AUTO_CREATE);
+                radiusValue = progress;
             }
 
             @Override
@@ -99,35 +107,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
-    private void setupServiceConnection(){
-        myConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                myService = ((Service.LocalBinder) service).getService();
-                bound = true;
-            }
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                myService = null;
-            }
-        };
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Bind to Service
-        setupServiceConnection();
-        bindService(new Intent(this, Service.class), myConnection, Context.BIND_AUTO_CREATE);
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the service
-        unbindService(myConnection);
-        bound = false;
-    }
+
 
     //TEST LYD MED KNAP OG SERVICE
     @Override

@@ -45,12 +45,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean userLocationKnown = false;
     private boolean tracing = true;
 
+    int radiusValue;
+
     // ArrayList<VehicleLocation> vehicleLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+
+        Intent radius = getIntent();
+        radiusValue = radius.getIntExtra("radius", 500);
 
         Intent data = getIntent();
         if(data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)){
@@ -97,7 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Add circle setup 500m
             CircleOptions myCircle = new CircleOptions()
                     .center(latlng)
-                    .radius(500);
+                    .radius(radiusValue);
             //plot in google maps - https://developers.google.com/android/reference/com/google/android/gms/maps/model/Circle
             Circle circle = mMap.addCircle(myCircle);
             circle.setStrokeColor(Color.RED);

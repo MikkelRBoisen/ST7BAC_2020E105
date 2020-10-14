@@ -1,5 +1,8 @@
 package com.example.st7bac_2020e105.Model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Inspired by "TheArnieExerciseFinder" model class
  */
@@ -10,13 +13,15 @@ public class VehicleLocation {
     private double longitude;
     private String vehicleType;
 
+
+    public VehicleLocation(){    }
+
     public VehicleLocation(double lati, double longi, String type)
     {
-        latitude = lati;
-        longitude = longi;
-        vehicleType = type;
+        this.latitude = lati;
+        this.longitude = longi;
+        this.vehicleType = type;
     }
-
 
     public double getLatitude() {
         return latitude;
@@ -29,5 +34,6 @@ public class VehicleLocation {
     public String getVehicleType() {
         return vehicleType;
     }
+
 
 }

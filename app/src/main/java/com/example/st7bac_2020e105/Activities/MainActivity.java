@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     Button test1;
     Button test2;
+    Button test3;
 
 
     @Override
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         test1 = (Button)findViewById(R.id.btnTest1);
         test2 = (Button)findViewById(R.id.btnTest2);
+        test3 = (Button)findViewById(R.id.btnTest3);
 
 
         test1.setOnClickListener(new View.OnClickListener() {
@@ -55,6 +57,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        test3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, EmergencyVehicleLocationActivity.class));
+            }
+        });
 
 
         test2.setOnClickListener(new View.OnClickListener() {
