@@ -29,16 +29,20 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     //Tilføjet "Implements View.OnClickListenter" - kan fjernes når knappen fjernes..
     Button testLydKnap;
     Button testActivity;
+    Button savechangesbtn;
 
 
     //Service
     private Service myService;
     private ServiceConnection myConnection;
     boolean bound = false;
+    private int newradius;
 
     //Adjusting volume
     SeekBar volume;
     AudioManager audioManager;
+
+    private int radiuschanged;
 
     SeekBar radius;
 
@@ -56,6 +60,18 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         testActivity = (Button)findViewById(R.id.btnTestNewActivity);
         testActivity.setOnClickListener(this);
         //
+
+        //save changes settings
+        savechangesbtn = (Button)findViewById(R.id.btn_safe_settingsactivity);
+        savechangesbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent radiusIntent =new Intent(SettingsActivity.this, MapsActivity.class);
+                radiusIntent.putExtra("radius",radiuschanged);
+                startActivity(radiusIntent);
+            }
+        });
+
 
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
@@ -86,9 +102,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         radius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            Intent radiusIntent =new Intent(SettingsActivity.this, Service.class);
-            radiusIntent.putExtra("radius",progress);
-            bindService(radiusIntent, myConnection, BIND_AUTO_CREATE);
+            //Intent radiusIntent =new Intent(SettingsActivity.this, Service.class);
+           // radiusIntent.putExtra("radius",progress);
+            //bindService(radiusIntent, myConnection, BIND_AUTO_CREATE);
+            radiuschanged = progress;
             }
 
             @Override
@@ -99,35 +116,35 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
-    private void setupServiceConnection(){
-        myConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                myService = ((Service.LocalBinder) service).getService();
-                bound = true;
-            }
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                myService = null;
-            }
-        };
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // Bind to Service
-        setupServiceConnection();
-        bindService(new Intent(this, Service.class), myConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        // Unbind from the service
-        unbindService(myConnection);
-        bound = false;
-    }
+//    private void setupServiceConnection(){
+//        myConnection = new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                myService = ((Service.LocalBinder) service).getService();
+//                bound = true;
+//            }
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//                myService = null;
+//            }
+//        };
+//    }
+//
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        // Bind to Service
+//        setupServiceConnection();
+//        bindService(new Intent(this, Service.class), myConnection, Context.BIND_AUTO_CREATE);
+//    }
+//
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        // Unbind from the service
+//        unbindService(myConnection);
+//        bound = false;
+//    }
 
     //TEST LYD MED KNAP OG SERVICE
     @Override

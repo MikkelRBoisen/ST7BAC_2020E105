@@ -17,6 +17,8 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.widget.Toast;
 
@@ -43,7 +45,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double userLatitude;
     private double userLongitude;
     private boolean userLocationKnown = false;
-    private boolean tracing = true;
+    private int radiusSettings;
+    private int radius = 500;
 
     // ArrayList<VehicleLocation> vehicleLocations;
 
@@ -59,6 +62,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(userLatitude!=0 && userLongitude!=0) {
                 userLocationKnown = true;
             }
+        }
+        radiusSettings = data.getIntExtra("radius",500);
+        if (radiusSettings != radius){
+            radius = radiusSettings;
         }
         setUpMapIfNeeded();
     }
@@ -97,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Add circle setup 500m
             CircleOptions myCircle = new CircleOptions()
                     .center(latlng)
-                    .radius(500);
+                    .radius(radius);
             //plot in google maps - https://developers.google.com/android/reference/com/google/android/gms/maps/model/Circle
             Circle circle = mMap.addCircle(myCircle);
             circle.setStrokeColor(Color.RED);
@@ -126,12 +133,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationUpdateReceiver);
     }
 
+
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent data) {
             //Toast.makeText(getApplicationContext(), "Got location update", Toast.LENGTH_SHORT).show();
             if(data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)){
-
                 userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
                 userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
                 if(userLatitude!=0 && userLongitude!=0) {
@@ -141,4 +148,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             setUpMap();
         }
     };
+
+
+    //creating menu with items; Beredskabslogin & settings
+    //inflating options menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    //Menu items selected
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //get item id
+        int id = item.getItemId();
+        if (id == R.id.item_Beredskabslogin){
+        }
+        if(id == R.id.item_Settings){
+            startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
