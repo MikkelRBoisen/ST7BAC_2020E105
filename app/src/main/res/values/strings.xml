@@ -26,6 +26,9 @@
     <!--EmergyncyVehcileLocationActivity strings-->
     <string name="txt_info_start">Tryk på knappen for at starte en udrykning</string>
     <string name="txt_info_stop">Tryk på knappen for at stoppe en udrykning</string>
+    <string name="txt_latitude">Latitude</string>
+    <string name="txt_longitude">Longitude</string>
+
 
 
 </resources>

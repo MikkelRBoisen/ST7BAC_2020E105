@@ -4,16 +4,25 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
+
 import android.location.LocationManager;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,118 +40,101 @@ import com.google.type.LatLng;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
-public class EmergencyVehicleLocationActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
+public class EmergencyVehicleLocationActivity extends AppCompatActivity implements View.OnClickListener {
 
     //Button: Inspired by https://www.youtube.com/watch?v=Nn4-Vn7qk9k&t=6s&ab_channel=CodinginFlow
+    // and https://stackoverflow.com/questions/34259618/android-using-imageview-onclick-to-change-image-back-and-forth
 
     //https://www.youtube.com/watch?v=hyi4dLyPtpI&t=2443s&ab_channel=ProgrammerWorld
 
 
     private DatabaseReference databaseReference;
-    private VehicleLocation vehicleLocation;
+    VehicleLocation vehicleLocation = new VehicleLocation();
 
-    private LocationListener locationListener;
-    private LocationManager locationManager;
-
-    private final long MIN_TIME = 1000; //1000 milisekunder
-    private final long MIN_DIST = 5; //5 meter
     Button startStopLocation;
+    private boolean greenButtonIsVisible = true;
+    private boolean writeToFirebase = false;
+
+    private double userLatitude;
+    private double userLongitude;
+
     TextView longi;
     TextView lati;
+    TextView infoText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_vehicle_location);
 
+        databaseReference = FirebaseDatabase.getInstance().getReference("Location");
         startStopLocation = findViewById(R.id.btn_startstoplocations);
         startStopLocation.setOnClickListener(EmergencyVehicleLocationActivity.this);
 
-        TextView infoText = findViewById(R.id.txt_info_emergencyvehiclelocation);
-        longi = (TextView)findViewById(R.id.txtLong);
-        lati = (TextView)findViewById(R.id.txtLat);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("Location");
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                try {
-                    String databaseLatitude = dataSnapshot.child("latitude").getValue().toString().substring(1,dataSnapshot.child("latitude").getValue().toString().length()-1);
-                    String databaseLongitude = dataSnapshot.child("longitude").getValue().toString().substring(1,dataSnapshot.child("longitude").getValue().toString().length()-1);
+        infoText = findViewById(R.id.txt_info_emergencyvehiclelocation);
+        lati = (TextView) findViewById(R.id.txtLat);
+        longi = (TextView) findViewById(R.id.txtLong);
 
-                    String[] strigLat = databaseLatitude.split(", ");
-                    Arrays.sort(strigLat);
-                    String latitudeString = strigLat[strigLat.length-1].split("=")[1];
-
-                    String[] strigLong = databaseLongitude.split(", ");
-                    Arrays.sort(strigLong);
-                    String longitudeString = strigLong[strigLat.length-1].split("=")[1];
-
-
-
-                } catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        Intent data = getIntent();
+        if (data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)) {
+            userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
+            userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
         }
-        Location location = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
-        try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DIST, locationListener);
-
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        onLocationChanged(location);
     }
-
-            @Override
-            public void onLocationChanged(Location location) {
-                lati.setText(Double.toString(location.getLatitude()));
-                longi.setText(Double.toString(location.getLongitude()));
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
 
 
     @Override
     public void onClick(View v) {
         if (v == startStopLocation) {
-            databaseReference.child("latitude").push().setValue(lati.getText().toString());
-            databaseReference.child("longitude").push().setValue(longi.getText().toString());
-            startStopLocation.setBackgroundResource(R.drawable.roedknap);
+            if (startStopLocation != null && greenButtonIsVisible) {
+                startStopLocation.setBackgroundResource(R.drawable.roedknap);
+                greenButtonIsVisible = false;
+                infoText.setText(R.string.txt_info_stop);
+                writeToFirebase = true;
+            }
+            else {
+                if (startStopLocation != null) {
+                    startStopLocation.setBackgroundResource(R.drawable.groenknap);
+                    greenButtonIsVisible = true;
+                    infoText.setText(R.string.txt_info_start);
+                    writeToFirebase = false;
+                }
+            }
         }
+    }
+
+
+    BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent data) {
+            if(data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)){
+                if (writeToFirebase == true)
+                {
+                    userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
+                    lati.setText(Double.toString(userLatitude));
+                    vehicleLocation.setLatitude(userLatitude);
+
+                    userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
+                    longi.setText(Double.toString(userLongitude));
+                    vehicleLocation.setLongitude(userLongitude);
+
+                    databaseReference.child("latitude").push().setValue(vehicleLocation.getLatitude());
+                    databaseReference.child("longitude").push().setValue(vehicleLocation.getLongitude());
+                }
+            }
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(locationUpdateReceiver, new IntentFilter("LOCATION_UPDATE"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(locationUpdateReceiver);
     }
 }

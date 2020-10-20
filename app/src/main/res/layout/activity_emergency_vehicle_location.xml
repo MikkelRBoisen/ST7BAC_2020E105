@@ -9,9 +9,10 @@
     <ImageView
         android:id="@+id/img_staticMaps"
         android:layout_width="wrap_content"
-        android:layout_height="300dp"
+        android:layout_height="0dp"
         android:background="@drawable/staticmapsimage"
         android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/txt_info_emergencyvehiclelocation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,25 +22,22 @@
         android:id="@+id/btn_startstoplocations"
         android:layout_width="250dp"
         android:layout_height="250dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
         android:layout_marginBottom="30dp"
         android:adjustViewBounds="true"
         android:background="@drawable/custom_button"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/txtLong" />
 
     <TextView
         android:id="@+id/txt_info_emergencyvehiclelocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
 
-        android:layout_marginStart="50dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginEnd="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginBottom="10dp"
+        android:gravity="center"
         android:text="@string/txt_info_start"
         android:textSize="25sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_startstoplocations"
@@ -50,16 +48,24 @@
         android:id="@+id/txtLat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/txt_info_emergencyvehiclelocation"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="80dp"
+        android:text="@string/txt_latitude"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txt_info_emergencyvehiclelocation" />
 
     <TextView
         android:id="@+id/txtLong"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/txt_info_emergencyvehiclelocation"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/txt_longitude"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtLat"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

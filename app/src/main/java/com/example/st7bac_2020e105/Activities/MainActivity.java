@@ -60,7 +60,14 @@ public class MainActivity extends AppCompatActivity {
         test3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, EmergencyVehicleLocationActivity.class));
+              //  startActivity(new Intent(MainActivity.this, EmergencyVehicleLocationActivity.class));
+                Intent emergencyActivityIntent = new Intent(getApplicationContext(), EmergencyVehicleLocationActivity.class);
+                if (userLocation != null) {
+                    //if location known, send it to the map activity
+                    emergencyActivityIntent.putExtra(EXTRA_USER_LATITUDE, userLocation.getLatitude());
+                    emergencyActivityIntent.putExtra(EXTRA_USER_LONGITUDE, userLocation.getLongitude());
+                }
+                startActivity(emergencyActivityIntent);
             }
         });
 
