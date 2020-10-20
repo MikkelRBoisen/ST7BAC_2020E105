@@ -39,7 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     private double userLatitude;
@@ -54,6 +54,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
+
+        //setting title for MapsActivity
+        //https://stackoverflow.com/questions/3975550/android-how-to-change-the-application-title
+        setTitle("Maps");
 
         Intent data = getIntent();
         if(data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)){
@@ -165,6 +169,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //get item id
         int id = item.getItemId();
         if (id == R.id.item_Beredskabslogin){
+            startActivity(new Intent(MapsActivity.this, EmergencyVehicleLocationActivity.class));
         }
         if(id == R.id.item_Settings){
             startActivity(new Intent(MapsActivity.this, SettingsActivity.class));

@@ -3,8 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/item_Settings"
-        android:title="Settings" />
+        android:title="Settings"
+        />
     <item
         android:id="@+id/item_Beredskabslogin"
-        android:title="Beredskabslogin" />
+        android:title="Beredskabslogin"
+        />
 </menu>
