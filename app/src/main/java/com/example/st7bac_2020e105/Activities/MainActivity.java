@@ -1,5 +1,6 @@
 package com.example.st7bac_2020e105.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -16,10 +17,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.st7bac_2020e105.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final long MIN_TIME_BETWEEN_LOCATION_UPDATES = 1000;    // milisecs
@@ -34,10 +41,13 @@ public class MainActivity extends AppCompatActivity {
     private Location userLocation;
     private double latitude, longitude;
 
+    private DatabaseReference databaseReference;
+
     Button test1;
     Button test2;
     Button test3;
 
+    private String test;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +56,21 @@ public class MainActivity extends AppCompatActivity {
 
         test1 = (Button)findViewById(R.id.btnTest1);
         test2 = (Button)findViewById(R.id.btnTest2);
-        test3 = (Button)findViewById(R.id.btnTest3);
+
+        final ArrayList<String> list = new ArrayList<>();
+
+//        databaseReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                Double downloaded_latitude = snapshot.child("latitude").getValue(Double.class);
+//                Double downloaded_longtitude = snapshot.child("longtitude").getValue(Double.class);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         test1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,19 +80,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        test3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  startActivity(new Intent(MainActivity.this, EmergencyVehicleLocationActivity.class));
-                Intent emergencyActivityIntent = new Intent(getApplicationContext(), EmergencyVehicleLocationActivity.class);
-                if (userLocation != null) {
-                    //if location known, send it to the map activity
-                    emergencyActivityIntent.putExtra(EXTRA_USER_LATITUDE, userLocation.getLatitude());
-                    emergencyActivityIntent.putExtra(EXTRA_USER_LONGITUDE, userLocation.getLongitude());
-                }
-                startActivity(emergencyActivityIntent);
-            }
-        });
 
 
         test2.setOnClickListener(new View.OnClickListener() {

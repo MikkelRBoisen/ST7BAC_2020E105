@@ -92,7 +92,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
 
         radius = (SeekBar)findViewById(R.id.seekBar_radius_settingsactivity);
-        radius.setMax(5000);
+        radius.setMax(1000);
         radius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

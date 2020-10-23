@@ -23,6 +23,7 @@ public class VehicleLocation {
         this.vehicleType = type;
     }
 
+
     public double getLatitude() {
         return latitude;
     }
@@ -47,12 +48,12 @@ public class VehicleLocation {
         this.vehicleType = vehicleType;
     }
 
-    public Map<String, Object> toMap()
-    {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("latitude", latitude);
-        result.put("longitude", longitude);
-        result.put("vehicleType", vehicleType);
-        return result;
-    }
+//    public Map<String, Object> toMap()
+//    {
+//        HashMap<String, Object> result = new HashMap<>();
+//        result.put("latitude", latitude);
+//        result.put("longitude", longitude);
+//        result.put("vehicleType", vehicleType);
+//        return result;
+//    }
 }

@@ -1,6 +1,7 @@
 package com.example.st7bac_2020e105.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,15 +31,19 @@ import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
 import com.example.st7bac_2020e105.Service;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.type.LatLng;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class EmergencyVehicleLocationActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,20 +66,23 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     TextView longi;
     TextView lati;
     TextView infoText;
+    List<Double> databaselocations;
+    TextView download_database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_vehicle_location);
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("Location");
         startStopLocation = findViewById(R.id.btn_startstoplocations);
         startStopLocation.setOnClickListener(EmergencyVehicleLocationActivity.this);
-
+        databaseReference = FirebaseDatabase.getInstance().getReference("Location");
 
         infoText = findViewById(R.id.txt_info_emergencyvehiclelocation);
         lati = (TextView) findViewById(R.id.txtLat);
         longi = (TextView) findViewById(R.id.txtLong);
+
+        download_database = (TextView) findViewById(R.id.tv_downloaddatabase);
 
         Intent data = getIntent();
         if (data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)) {
@@ -82,6 +90,27 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
             userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
         }
     }
+
+    public void recievedata(){
+        final FirebaseDatabase fb = FirebaseDatabase.getInstance();
+        DatabaseReference ref = fb.getReference("Location/VehicleLocation");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                snapshot.getChildren();
+                VehicleLocation vehicleLocation = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
+                databaselocations.add(vehicleLocation.getLatitude());
+            }
+            
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
 
 
     @Override
@@ -104,7 +133,6 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         }
     }
 
-
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent data) {
@@ -119,8 +147,8 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     longi.setText(Double.toString(userLongitude));
                     vehicleLocation.setLongitude(userLongitude);
 
-                    databaseReference.child("latitude").push().setValue(vehicleLocation.getLatitude());
-                    databaseReference.child("longitude").push().setValue(vehicleLocation.getLongitude());
+                    databaseReference.child("VehicleLocation").push().setValue(vehicleLocation);
+                   // recievedata();
                 }
             }
         }

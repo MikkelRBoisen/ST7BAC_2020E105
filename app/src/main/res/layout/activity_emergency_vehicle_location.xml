@@ -68,4 +68,14 @@
         app:layout_constraintTop_toBottomOf="@+id/txtLat"
         app:layout_constraintVertical_bias="0.0" />
 
+    <TextView
+        android:id="@+id/tv_downloaddatabase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_startstoplocations" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
