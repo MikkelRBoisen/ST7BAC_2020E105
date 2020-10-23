@@ -23,6 +23,7 @@ public class VehicleLocation {
         this.vehicleType = type;
     }
 
+
     public double getLatitude() {
         return latitude;
     }

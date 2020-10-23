@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.widget.Toast;
 
+import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -38,6 +39,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -48,6 +54,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int radiusSettings;
     private int radius = 500;
 
+    private DatabaseReference databaseReference;
     // ArrayList<VehicleLocation> vehicleLocations;
 
     @Override
@@ -58,6 +65,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //setting title for MapsActivity
         //https://stackoverflow.com/questions/3975550/android-how-to-change-the-application-title
         setTitle("Maps");
+
 
         Intent data = getIntent();
         if(data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)){
@@ -92,6 +100,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+
+
+
+
     private void setUpMap() {
         if(userLocationKnown) {
             //Clear map from old markers
@@ -99,12 +111,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             //Create marker
             MarkerOptions marker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
-            //marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
             mMap.addMarker(marker);
-            //mMap.addMarker(new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here!"));
-            //new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.car));
-
             LatLng latlng = new LatLng(userLatitude,userLongitude);
+
             //Add circle setup 500m
             CircleOptions myCircle = new CircleOptions()
                     .center(latlng)
@@ -118,8 +127,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     private void zoomToUser(){
         if(userLocationKnown) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(userLatitude, userLongitude), 15));
+            if(radius == 500){
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(userLatitude, userLongitude), 15));
+            }
+            if(radius <= 499){
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(userLatitude, userLongitude), 17));
+            }
+            if(radius >= 501 && radius <= 750){
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(userLatitude, userLongitude), 14));
+            }
+            if(radius >= 751){
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(userLatitude, userLongitude), 13));
+            }
+
         } else {
             Toast.makeText(getApplicationContext(), "User location unknown", Toast.LENGTH_SHORT).show();
         }
