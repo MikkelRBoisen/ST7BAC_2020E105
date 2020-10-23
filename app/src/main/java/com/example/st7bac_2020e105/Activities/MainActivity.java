@@ -1,5 +1,6 @@
 package com.example.st7bac_2020e105.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -19,7 +20,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
     private static final long MIN_TIME_BETWEEN_LOCATION_UPDATES = 1000;    // milisecs
@@ -36,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
     Button test1;
     Button test2;
-    Button test3;
 
 
     @Override
@@ -46,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 
         test1 = (Button)findViewById(R.id.btnTest1);
         test2 = (Button)findViewById(R.id.btnTest2);
-        test3 = (Button)findViewById(R.id.btnTest3);
 
         test1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,19 +62,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        test3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  startActivity(new Intent(MainActivity.this, EmergencyVehicleLocationActivity.class));
-                Intent emergencyActivityIntent = new Intent(getApplicationContext(), EmergencyVehicleLocationActivity.class);
-                if (userLocation != null) {
-                    //if location known, send it to the map activity
-                    emergencyActivityIntent.putExtra(EXTRA_USER_LATITUDE, userLocation.getLatitude());
-                    emergencyActivityIntent.putExtra(EXTRA_USER_LONGITUDE, userLocation.getLongitude());
-                }
-                startActivity(emergencyActivityIntent);
-            }
-        });
 
 
         test2.setOnClickListener(new View.OnClickListener() {

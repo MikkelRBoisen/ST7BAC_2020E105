@@ -169,7 +169,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //get item id
         int id = item.getItemId();
         if (id == R.id.item_Beredskabslogin){
-            startActivity(new Intent(MapsActivity.this, EmergencyVehicleLocationActivity.class));
+            startActivity(new Intent(MapsActivity.this, LoginActivity.class));
         }
         if(id == R.id.item_Settings){
             startActivity(new Intent(MapsActivity.this, SettingsActivity.class));

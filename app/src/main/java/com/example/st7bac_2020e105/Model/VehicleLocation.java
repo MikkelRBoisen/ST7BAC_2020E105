@@ -9,9 +9,9 @@ import java.util.Map;
 
 public class VehicleLocation {
 
-    private double latitude;
-    private double longitude;
-    private String vehicleType;
+    public double latitude;
+    public double longitude;
+    public String vehicleType;
 
 
     public VehicleLocation(){    }
@@ -47,12 +47,12 @@ public class VehicleLocation {
         this.vehicleType = vehicleType;
     }
 
-    public Map<String, Object> toMap()
-    {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("latitude", latitude);
-        result.put("longitude", longitude);
-        result.put("vehicleType", vehicleType);
-        return result;
-    }
+//    public Map<String, Object> toMap()
+//    {
+//        HashMap<String, Object> result = new HashMap<>();
+//        result.put("latitude", latitude);
+//        result.put("longitude", longitude);
+//        result.put("vehicleType", vehicleType);
+//        return result;
+//    }
 }

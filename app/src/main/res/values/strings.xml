@@ -28,6 +28,12 @@
     <string name="txt_info_stop">Tryk på knappen for at stoppe en udrykning</string>
     <string name="txt_latitude">Latitude</string>
     <string name="txt_longitude">Longitude</string>
+    <string name="btn_logout_text">Log ud</string>
+
+
+    <!--LoginActivity strings-->
+    <string name="AuthenticationFailedToast">Authentication failed</string>
+
 
 
 

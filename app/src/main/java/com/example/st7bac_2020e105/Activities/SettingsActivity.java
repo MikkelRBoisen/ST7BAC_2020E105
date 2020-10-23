@@ -14,6 +14,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.example.st7bac_2020e105.Alarm;
 import com.example.st7bac_2020e105.R;
@@ -36,14 +37,20 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     //Adjusting volume
     SeekBar volume;
     AudioManager audioManager;
+    TextView volumeIndicator;
 
+    //Adjusting radius
     SeekBar radius;
     int radiusValue;
+    TextView radiusIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        volumeIndicator = (TextView)findViewById(R.id.txt_volumeIndicator);
+        radiusIndicator = (TextView)findViewById(R.id.txt_radiusIndicator);
 
         // TEST LYD MED KNAP
         testLydKnap = (Button)findViewById(R.id.btnTestSound);
@@ -81,6 +88,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
             {
                 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+                volumeIndicator.setText(Integer.toString(progress) + " %");
             }
 
             @Override
@@ -92,11 +100,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
 
         radius = (SeekBar)findViewById(R.id.seekBar_radius_settingsactivity);
-        radius.setMax(5000);
+        radius.setMax(1000);
         radius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 radiusValue = progress;
+                radiusIndicator.setText(Integer.toString(progress) + " meter");
             }
 
             @Override

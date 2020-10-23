@@ -1,6 +1,7 @@
 package com.example.st7bac_2020e105.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,15 +31,24 @@ import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
 import com.example.st7bac_2020e105.Service;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.type.LatLng;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class EmergencyVehicleLocationActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -49,7 +59,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
 
 
     private DatabaseReference databaseReference;
-    VehicleLocation vehicleLocation = new VehicleLocation();
+    VehicleLocation vehicleLocation = new VehicleLocation(0,0,"");
 
     Button startStopLocation;
     private boolean greenButtonIsVisible = true;
@@ -62,15 +72,26 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     TextView lati;
     TextView infoText;
 
+    private FirebaseAuth firebase;
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
+    Button logOut;
+
+   // private List<VehicleLocation> latitudeAndLongitudeList;
+
+    ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_vehicle_location);
 
+
         databaseReference = FirebaseDatabase.getInstance().getReference("Location");
         startStopLocation = findViewById(R.id.btn_startstoplocations);
         startStopLocation.setOnClickListener(EmergencyVehicleLocationActivity.this);
 
+        logOut = (Button)findViewById(R.id.btn_logOut);
 
         infoText = findViewById(R.id.txt_info_emergencyvehiclelocation);
         lati = (TextView) findViewById(R.id.txtLat);
@@ -81,6 +102,29 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
             userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
             userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
         }
+
+        logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebase.getInstance().signOut();
+                auth.signOut();
+                Toast.makeText(EmergencyVehicleLocationActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ShowData(snapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 
@@ -104,6 +148,38 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         }
     }
 
+//    public void ReadFromFirebase()
+//    {
+//        final FirebaseDatabase  fb = FirebaseDatabase .getInstance();
+//        DatabaseReference ref = fb.getReference("Location/VehicleLocation");
+//
+//        ref.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                snapshot.getChildren();
+//                VehicleLocation vehicleLocation = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
+//
+//                latitudeAndLongitudeList.add(vehicleLocation);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
+
+    public void ShowData(DataSnapshot snapshot)
+    {
+        for (DataSnapshot ds : snapshot.getChildren())
+        {
+            VehicleLocation vehicleLocation2 = new VehicleLocation();
+            vehicleLocation2 = ds.getChildren().iterator().next().getValue(VehicleLocation.class);
+            vehicleLocationArray.add(vehicleLocation2);
+            vehicleLocationArray.size();
+        }
+    }
+
 
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
         @Override
@@ -119,8 +195,8 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     longi.setText(Double.toString(userLongitude));
                     vehicleLocation.setLongitude(userLongitude);
 
-                    databaseReference.child("latitude").push().setValue(vehicleLocation.getLatitude());
-                    databaseReference.child("longitude").push().setValue(vehicleLocation.getLongitude());
+                    databaseReference.child("VehicleLocation").push().setValue(vehicleLocation);
+                    //ReadFromFirebase();
                 }
             }
         }
