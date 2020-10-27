@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         automatiskLoginKnap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                username.setText("test@gmail.com");
+                username.setText("test");
                 password.setText("123456789");
             }
         });
