@@ -47,13 +47,4 @@ public class VehicleLocation {
     public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
     }
-
-//    public Map<String, Object> toMap()
-//    {
-//        HashMap<String, Object> result = new HashMap<>();
-//        result.put("latitude", latitude);
-//        result.put("longitude", longitude);
-//        result.put("vehicleType", vehicleType);
-//        return result;
-//    }
 }

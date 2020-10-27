@@ -32,11 +32,13 @@ import com.example.st7bac_2020e105.R;
 import com.example.st7bac_2020e105.Service;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -72,14 +74,15 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     TextView lati;
     TextView infoText;
 
-    private FirebaseAuth firebase;
+    //TEST
+    Button test123123;
+
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     Button logOut;
 
-   // private List<VehicleLocation> latitudeAndLongitudeList;
-
     ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
 
+    public String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +94,22 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         startStopLocation = findViewById(R.id.btn_startstoplocations);
         startStopLocation.setOnClickListener(EmergencyVehicleLocationActivity.this);
 
+        //Trim the email to get the corret Child-name in Firebase
+        String email = auth.getCurrentUser().getEmail().toString();
+        username = email.substring(0, email.lastIndexOf("@"));
+
         logOut = (Button)findViewById(R.id.btn_logOut);
+
+        //TEST
+        test123123 = (Button)findViewById(R.id.btn_test123);
+        test123123.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vehicleLocationArray.size();
+                test123123.setText(String.valueOf(vehicleLocationArray.size()));
+            }
+        });
+        //END OF TEST
 
         infoText = findViewById(R.id.txt_info_emergencyvehiclelocation);
         lati = (TextView) findViewById(R.id.txtLat);
@@ -106,15 +124,14 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         logOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                firebase.getInstance().signOut();
                 auth.signOut();
                 Toast.makeText(EmergencyVehicleLocationActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
 
-
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        Query lastQuery = databaseReference.child(username).orderByKey().limitToLast(1);
+        lastQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ShowData(snapshot);
@@ -148,34 +165,13 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         }
     }
 
-//    public void ReadFromFirebase()
-//    {
-//        final FirebaseDatabase  fb = FirebaseDatabase .getInstance();
-//        DatabaseReference ref = fb.getReference("Location/VehicleLocation");
-//
-//        ref.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                snapshot.getChildren();
-//                VehicleLocation vehicleLocation = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
-//
-//                latitudeAndLongitudeList.add(vehicleLocation);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
-
     public void ShowData(DataSnapshot snapshot)
     {
         for (DataSnapshot ds : snapshot.getChildren())
         {
-            VehicleLocation vehicleLocation2 = new VehicleLocation();
-            vehicleLocation2 = ds.getChildren().iterator().next().getValue(VehicleLocation.class);
-            vehicleLocationArray.add(vehicleLocation2);
+            VehicleLocation vehicleLocationzz = new VehicleLocation();
+            vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
+            vehicleLocationArray.add(vehicleLocationzz);
             vehicleLocationArray.size();
         }
     }
@@ -195,8 +191,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     longi.setText(Double.toString(userLongitude));
                     vehicleLocation.setLongitude(userLongitude);
 
-                    databaseReference.child("VehicleLocation").push().setValue(vehicleLocation);
-                    //ReadFromFirebase();
+                    databaseReference.child(username).push().setValue(vehicleLocation);
                 }
             }
         }
