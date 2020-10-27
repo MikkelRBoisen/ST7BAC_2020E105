@@ -71,7 +71,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     TextView longi;
     TextView lati;
     TextView infoText;
-
+    private String vehicleType;
     private FirebaseAuth firebase;
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     Button logOut;
@@ -98,6 +98,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         longi = (TextView) findViewById(R.id.txtLong);
 
         Intent data = getIntent();
+        vehicleType = getIntent().getStringExtra("Vehicle");
         if (data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)) {
             userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
             userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
@@ -190,6 +191,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
                     lati.setText(Double.toString(userLatitude));
                     vehicleLocation.setLatitude(userLatitude);
+                    vehicleLocation.setVehicleType(vehicleType);
 
                     userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
                     longi.setText(Double.toString(userLongitude));

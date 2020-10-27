@@ -23,6 +23,15 @@
     <string name="textView_radius">Radius</string>
     <string name="safe_button">Gem ændringer</string>
 
+        <string-array name="spinner_items">
+            <item>Vælg køretøjtype...</item>
+            <item>Ambulance</item>
+            <item>Brandbil</item>
+            <item>Lægebil</item>
+            <item>Andet</item>
+        </string-array>
+
+
     <!--EmergyncyVehcileLocationActivity strings-->
     <string name="txt_info_start">Tryk på knappen for at starte en udrykning</string>
     <string name="txt_info_stop">Tryk på knappen for at stoppe en udrykning</string>

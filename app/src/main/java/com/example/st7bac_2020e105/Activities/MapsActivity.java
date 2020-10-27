@@ -100,10 +100,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
-
-
-
     private void setUpMap() {
         if(userLocationKnown) {
             //Clear map from old markers
@@ -172,6 +168,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(userLatitude!=0 && userLongitude!=0) {
                     userLocationKnown = true;
                 }
+                
             }
             setUpMap();
         }
