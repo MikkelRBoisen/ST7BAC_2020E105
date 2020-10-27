@@ -191,6 +191,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
                     lati.setText(Double.toString(userLatitude));
                     vehicleLocation.setLatitude(userLatitude);
+                    vehicleLocation.setVehicleType(vehicleType);
 
                     userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
                     longi.setText(Double.toString(userLongitude));
