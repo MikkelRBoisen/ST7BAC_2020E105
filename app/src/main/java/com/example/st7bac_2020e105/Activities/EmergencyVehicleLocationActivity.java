@@ -45,11 +45,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.type.DateTime;
 import com.google.type.LatLng;
 
 import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public class EmergencyVehicleLocationActivity extends AppCompatActivity implements View.OnClickListener {
@@ -61,7 +68,11 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
 
 
     private DatabaseReference databaseReference;
-    VehicleLocation vehicleLocation = new VehicleLocation(0,0,"");
+
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
+    String defualtDate = dateFormat.format(new Date(0));
+    String todaysDate = dateFormat.format(new Date());
+    VehicleLocation vehicleLocation = new VehicleLocation(0,0,"","", defualtDate);
 
     Button startStopLocation;
     private boolean greenButtonIsVisible = true;
@@ -82,11 +93,14 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     Button logOut;
 
-   // private List<VehicleLocation> latitudeAndLongitudeList;
 
     ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
+    ArrayList<ArrayList<VehicleLocation>> arrayListArrayList = new ArrayList<>();
+
+    HashMap<String, VehicleLocation> map = new HashMap<String, VehicleLocation>();
 
     public String username;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +115,8 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         //Trim the email to get the corret Child-name in Firebase
         String email = auth.getCurrentUser().getEmail().toString();
         username = email.substring(0, email.lastIndexOf("@"));
+
+
 
         logOut = (Button)findViewById(R.id.btn_logOut);
 
@@ -135,16 +151,61 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
             }
         });
 
-        Query lastQuery = databaseReference.child(username).orderByKey().limitToLast(1);
-        lastQuery.addValueEventListener(new ValueEventListener() {
+
+
+
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ShowData(snapshot);
-            }
+                for (DataSnapshot ds : snapshot.getChildren())
+                {
+                    final String key = ds.getKey();
 
+                    databaseReference.child(key).orderByChild(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            VehicleLocation vehicleLocationzz = new VehicleLocation();
+                            vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
+
+                            //Get the current time of the system
+                            long miliSec = System.currentTimeMillis();
+                            //Insert systemCurrentTime to the date format: yyyy-MM-dd HH:mm:sss
+                            String currentDate = dateFormat.format(miliSec);
+
+                            String databaseTimeSeconds = vehicleLocationzz.timestamp.substring(0,16);
+                            String systemTimeSeconds = currentDate.substring(0,16);
+
+                                //https://stackoverflow.com/questions/23283118/comparing-two-time-in-strings
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                                try {
+                                    Date databaseTimeDate = sdf.parse(databaseTimeSeconds);
+                                    Date systemTimeDate = sdf.parse(systemTimeSeconds);
+
+                                    //Compare time elapsed between the two timestamps
+                                    long elapsed = systemTimeDate.getTime() - databaseTimeDate.getTime();
+                                    //https://stackoverflow.com/questions/4355303/how-can-i-convert-a-long-to-int-in-java
+                                    int convertLongToInt = (int) elapsed;
+                                    //Convert from milliseconds to minutes
+                                    int timeBetweenTimeDates = convertLongToInt/60000;
+
+                                    //if timestamp from database is more than 5 min older, don't add to map:
+                                    if (timeBetweenTimeDates<=5)
+                                    {
+                                        map.put(snapshot.getKey(), vehicleLocationzz);
+                                    }
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                        }
+                    });
+                }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
@@ -158,6 +219,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                 greenButtonIsVisible = false;
                 infoText.setText(R.string.txt_info_stop);
                 writeToFirebase = true;
+          //      databaseReference.child(username).push().setValue(true);
             }
             else {
                 if (startStopLocation != null) {
@@ -165,21 +227,14 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     greenButtonIsVisible = true;
                     infoText.setText(R.string.txt_info_start);
                     writeToFirebase = false;
+
+//                    databaseReference.child(username).push().setValue(false);
                 }
             }
         }
     }
 
-    public void ShowData(DataSnapshot snapshot)
-    {
-        for (DataSnapshot ds : snapshot.getChildren())
-        {
-            VehicleLocation vehicleLocationzz = new VehicleLocation();
-            vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
-            vehicleLocationArray.add(vehicleLocationzz);
-            vehicleLocationArray.size();
-        }
-    }
+
 
 
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
@@ -196,6 +251,10 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
                     longi.setText(Double.toString(userLongitude));
                     vehicleLocation.setLongitude(userLongitude);
+
+                    vehicleLocation.setUserId(username);
+
+                    vehicleLocation.setTimestamp(todaysDate);
 
                     databaseReference.child(username).push().setValue(vehicleLocation);
                 }
