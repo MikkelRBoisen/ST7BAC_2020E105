@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.widget.Toast;
 
+import com.example.st7bac_2020e105.Model.VehicleItem;
 import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -39,11 +40,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.clustering.ClusterManager;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -54,8 +60,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int radiusSettings;
     private int radius = 500;
 
+
     private DatabaseReference databaseReference;
-    // ArrayList<VehicleLocation> vehicleLocations;
+    ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +73,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         //https://stackoverflow.com/questions/3975550/android-how-to-change-the-application-title
         setTitle("Maps");
 
+        databaseReference = FirebaseDatabase.getInstance().getReference("Location");
+        ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
 
         Intent data = getIntent();
         if(data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)){
@@ -80,7 +89,46 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             radius = radiusSettings;
         }
         setUpMapIfNeeded();
+
+
+//Trim the email to get the corret Child-name in Firebase
+        Query lastQuery = databaseReference.child("test").orderByKey().limitToLast(1);
+        lastQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ShowData(snapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
+
+    private void ShowData(DataSnapshot snapshot) {
+        VehicleLocation vehicleLocationzz = new VehicleLocation();
+        vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
+        vehicleLocationArray.clear();
+        vehicleLocationArray.add(vehicleLocationzz);
+
+        MarkerOptions emergencymarker = new MarkerOptions().position(new LatLng(vehicleLocationArray.iterator().next().latitude, vehicleLocationArray.iterator().next().longitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
+        mMap.addMarker(emergencymarker);
+
+        MarkerOptions Usermarker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
+        mMap.addMarker(Usermarker);
+        LatLng latlng = new LatLng(userLatitude,userLongitude);
+
+        //Add circle setup 500m
+        CircleOptions myCircle = new CircleOptions()
+                .center(latlng)
+                .radius(radius);
+        //plot in google maps - https://developers.google.com/android/reference/com/google/android/gms/maps/model/Circle
+        Circle circle = mMap.addCircle(myCircle);
+        circle.setStrokeColor(Color.RED);
+        circle.setFillColor(0x220000FF);
+    }
+
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -104,12 +152,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(userLocationKnown) {
             //Clear map from old markers
             mMap.clear();
-
             //Create marker
-            MarkerOptions marker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
-            mMap.addMarker(marker);
+            MarkerOptions Usermarker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
+            mMap.addMarker(Usermarker);
             LatLng latlng = new LatLng(userLatitude,userLongitude);
 
+            
             //Add circle setup 500m
             CircleOptions myCircle = new CircleOptions()
                     .center(latlng)

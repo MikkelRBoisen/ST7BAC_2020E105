@@ -71,10 +71,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         vehicleSpinner = findViewById(R.id.spinner);
         customList = getCustomList();
         VehicleItemAdapter adapter = new VehicleItemAdapter(this, customList);
-
         //if (vehicleSpinner == null) {
             vehicleSpinner.setAdapter(adapter);
             vehicleSpinner.setOnItemSelectedListener(this);
+            vehicleSpinner.setSelection(0,false);
         //}
 
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -149,15 +149,17 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         } catch (Exception e) {
         }
         vehicleSpinner.setDropDownWidth(width);
-        VehicleItem item = (VehicleItem)adapterView.getSelectedItem();
 
-        if(item.getSpinneritemsName().equals("Ambulance")){
-            Toast.makeText(this, item.getSpinneritemsName(), Toast.LENGTH_SHORT).show();
+        if (position > 0) {
+            VehicleItem item = (VehicleItem)adapterView.getSelectedItem();
+            if(item.getSpinneritemsName().equals("Ambulance")){
+                Toast.makeText(this, item.getSpinneritemsName(), Toast.LENGTH_SHORT).show();
+            }
+            if (item.getSpinneritemsName().equals("Brandbil")){
+                Toast.makeText(this, item.getSpinneritemsName(), Toast.LENGTH_SHORT).show();
+            }
+            VehicleChosen = item.getSpinneritemsName();
         }
-        if (item.getSpinneritemsName().equals("Brandbil")){
-            Toast.makeText(this, item.getSpinneritemsName(), Toast.LENGTH_SHORT).show();
-        }
-        VehicleChosen = item.getSpinneritemsName();
     }
 
     @Override
