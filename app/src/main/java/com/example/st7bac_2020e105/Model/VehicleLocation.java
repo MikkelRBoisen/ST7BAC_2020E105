@@ -1,5 +1,8 @@
 package com.example.st7bac_2020e105.Model;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +10,7 @@ import java.util.Map;
  * Inspired by "TheArnieExerciseFinder" model class
  */
 
-public class VehicleLocation {
+public class VehicleLocation{
 
     public double latitude;
     public double longitude;
@@ -47,4 +50,5 @@ public class VehicleLocation {
     public void setVehicleType(String vehicleType) {
         this.vehicleType = vehicleType;
     }
+
 }
