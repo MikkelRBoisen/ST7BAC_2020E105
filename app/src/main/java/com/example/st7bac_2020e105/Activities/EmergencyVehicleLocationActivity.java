@@ -194,6 +194,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                                     {
                                         map.put(snapshot.getKey(), vehicleLocationzz);
                                     }
+
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
@@ -209,6 +210,8 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
             }
         });
     }
+
+
 
 
     @Override
