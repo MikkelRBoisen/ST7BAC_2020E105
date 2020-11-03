@@ -155,59 +155,59 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
 
 
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren())
-                {
-                    final String key = ds.getKey();
-
-                    databaseReference.child(key).orderByChild(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            VehicleLocation vehicleLocationzz = new VehicleLocation();
-                            vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
-
-                            //Get the current time of the system
-                            long miliSec = System.currentTimeMillis();
-                            //Insert systemCurrentTime to the date format: yyyy-MM-dd HH:mm:sss
-                            String currentDate = dateFormat.format(miliSec);
-
-                            String databaseTimeSeconds = vehicleLocationzz.timestamp.substring(0,16);
-                            String systemTimeSeconds = currentDate.substring(0,16);
-
-                                //https://stackoverflow.com/questions/23283118/comparing-two-time-in-strings
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                                try {
-                                    Date databaseTimeDate = sdf.parse(databaseTimeSeconds);
-                                    Date systemTimeDate = sdf.parse(systemTimeSeconds);
-
-                                    //Compare time elapsed between the two timestamps
-                                    long elapsed = systemTimeDate.getTime() - databaseTimeDate.getTime();
-                                    //https://stackoverflow.com/questions/4355303/how-can-i-convert-a-long-to-int-in-java
-                                    int convertLongToInt = (int) elapsed;
-                                    //Convert from milliseconds to minutes
-                                    int timeBetweenTimeDates = convertLongToInt/60000;
-
-                                    //if timestamp from database is more than 5 min older, don't add to map:
-                                    if (timeBetweenTimeDates<=5)
-                                    {
-                                        map.put(snapshot.getKey(), vehicleLocationzz);
-                                    }
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                        }
-                    });
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
+//        databaseReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot ds : snapshot.getChildren())
+//                {
+//                    final String key = ds.getKey();
+//
+//                    databaseReference.child(key).orderByChild(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                            VehicleLocation vehicleLocationzz = new VehicleLocation();
+//                            vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
+//
+//                            //Get the current time of the system
+//                            long miliSec = System.currentTimeMillis();
+//                            //Insert systemCurrentTime to the date format: yyyy-MM-dd HH:mm:sss
+//                            String currentDate = dateFormat.format(miliSec);
+//
+//                            String databaseTimeSeconds = vehicleLocationzz.timestamp.substring(0,16);
+//                            String systemTimeSeconds = currentDate.substring(0,16);
+//
+//                                //https://stackoverflow.com/questions/23283118/comparing-two-time-in-strings
+//                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//                                try {
+//                                    Date databaseTimeDate = sdf.parse(databaseTimeSeconds);
+//                                    Date systemTimeDate = sdf.parse(systemTimeSeconds);
+//
+//                                    //Compare time elapsed between the two timestamps
+//                                    long elapsed = systemTimeDate.getTime() - databaseTimeDate.getTime();
+//                                    //https://stackoverflow.com/questions/4355303/how-can-i-convert-a-long-to-int-in-java
+//                                    int convertLongToInt = (int) elapsed;
+//                                    //Convert from milliseconds to minutes
+//                                    int timeBetweenTimeDates = convertLongToInt/60000;
+//
+//                                    //if timestamp from database is more than 5 min older, don't add to map:
+//                                    if (timeBetweenTimeDates<=5)
+//                                    {
+//                                        map.put(snapshot.getKey(), vehicleLocationzz);
+//                                    }
+//                                } catch (ParseException e) {
+//                                    e.printStackTrace();
+//                                }
+//                        }
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError error) {
+//                        }
+//                    });
+//                }
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//            }
+//        });
     }
 
 
