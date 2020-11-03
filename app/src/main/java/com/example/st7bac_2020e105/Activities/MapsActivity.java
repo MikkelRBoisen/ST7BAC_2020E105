@@ -49,7 +49,13 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -57,12 +63,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double userLatitude;
     private double userLongitude;
     private boolean userLocationKnown = false;
+
+    private double databaselatitude;
+    private double databaselongtitude;
+
     private int radiusSettings;
     private int radius = 500;
+    HashMap<String, VehicleLocation> map = new HashMap<String, VehicleLocation>();
 
 
     private DatabaseReference databaseReference;
-    ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
+    String defualtDate = dateFormat.format(new Date(0));
+    String todaysDate = dateFormat.format(new Date());
+    VehicleLocation vehicleLocation = new VehicleLocation(0,0,"","", defualtDate);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,44 +105,61 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setUpMapIfNeeded();
 
 
-//Trim the email to get the corret Child-name in Firebase
-        Query lastQuery = databaseReference.child("test").orderByKey().limitToLast(1);
-        lastQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ShowData(snapshot);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            for (DataSnapshot ds : snapshot.getChildren())
+            {
+                final String key = ds.getKey();
+
+                databaseReference.child(key).orderByChild(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        VehicleLocation vehicleLocationzz = new VehicleLocation();
+                        vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
+
+                        //Get the current time of the system
+                        long miliSec = System.currentTimeMillis();
+                        //Insert systemCurrentTime to the date format: yyyy-MM-dd HH:mm:sss
+                        String currentDate = dateFormat.format(miliSec);
+
+                        String databaseTimeSeconds = vehicleLocationzz.timestamp.substring(0,16);
+                        String systemTimeSeconds = currentDate.substring(0,16);
+
+                        //https://stackoverflow.com/questions/23283118/comparing-two-time-in-strings
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                        try {
+                            Date databaseTimeDate = sdf.parse(databaseTimeSeconds);
+                            Date systemTimeDate = sdf.parse(systemTimeSeconds);
+
+                            //Compare time elapsed between the two timestamps
+                            long elapsed = systemTimeDate.getTime() - databaseTimeDate.getTime();
+                            //https://stackoverflow.com/questions/4355303/how-can-i-convert-a-long-to-int-in-java
+                            int convertLongToInt = (int) elapsed;
+                            //Convert from milliseconds to minutes
+                            int timeBetweenTimeDates = convertLongToInt/60000;
+
+                            //if timestamp from database is more than 5 min older, don't add to map:
+                            if (timeBetweenTimeDates<=5)
+                            {
+                                map.put(snapshot.getKey(), vehicleLocationzz);
+                                setUpMap();
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void ShowData(DataSnapshot snapshot) {
-        VehicleLocation vehicleLocationzz = new VehicleLocation();
-        vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
-        vehicleLocationArray.clear();
-        vehicleLocationArray.add(vehicleLocationzz);
-
-        MarkerOptions emergencymarker = new MarkerOptions().position(new LatLng(vehicleLocationArray.iterator().next().latitude, vehicleLocationArray.iterator().next().longitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
-        mMap.addMarker(emergencymarker);
-
-        MarkerOptions Usermarker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
-        mMap.addMarker(Usermarker);
-        LatLng latlng = new LatLng(userLatitude,userLongitude);
-
-        //Add circle setup 500m
-        CircleOptions myCircle = new CircleOptions()
-                .center(latlng)
-                .radius(radius);
-        //plot in google maps - https://developers.google.com/android/reference/com/google/android/gms/maps/model/Circle
-        Circle circle = mMap.addCircle(myCircle);
-        circle.setStrokeColor(Color.RED);
-        circle.setFillColor(0x220000FF);
-    }
-
+        }
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+        }
+    });
+}
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -152,12 +183,41 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(userLocationKnown) {
             //Clear map from old markers
             mMap.clear();
+
+            for (Map.Entry<String, VehicleLocation> item : map.entrySet()) {
+                VehicleLocation value = item.getValue();
+                value.getVehicleType();
+                if(value.vehicleType.equals("Ambulance")) {
+                    MarkerOptions AmbulanceVehicle = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
+                    AmbulanceVehicle.icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
+                    mMap.addMarker(AmbulanceVehicle);
+                }
+                if(value.vehicleType.equals("Brandbil")) {
+                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
+                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.brandbil));
+                    mMap.addMarker(FireTruck);
+                }
+            }
+//            {
+//                databaselatitude =  map.values().iterator().next().latitude;
+//                databaselongtitude = map.values().iterator().next().longitude;
+//
+//                if(map.values().iterator().next().vehicleType.equals("Ambulance")) {
+//                    MarkerOptions AmbulanceVehicle = new MarkerOptions().position(new LatLng(databaselatitude, databaselongtitude));
+//                    AmbulanceVehicle.icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
+//                    mMap.addMarker(AmbulanceVehicle);
+//                }
+//                if(map.values().iterator().next().vehicleType.equals("Brandbil")) {
+//                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(databaselatitude, databaselongtitude));
+//                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.brandbil));
+//                    mMap.addMarker(FireTruck);
+//                }
+//            }
             //Create marker
             MarkerOptions Usermarker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
             mMap.addMarker(Usermarker);
             LatLng latlng = new LatLng(userLatitude,userLongitude);
 
-            
             //Add circle setup 500m
             CircleOptions myCircle = new CircleOptions()
                     .center(latlng)
@@ -173,7 +233,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(userLocationKnown) {
             if(radius == 500){
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 15));
+                        new LatLng(userLatitude, userLongitude), 13));
             }
             if(radius <= 499){
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -218,7 +278,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 
             }
-            setUpMap();
+            //setUpMap();
         }
     };
 

@@ -30,8 +30,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
-    private static final long MIN_TIME_BETWEEN_LOCATION_UPDATES = 1000;    // milisecs
-    private static final float MIN_DISTANCE_MOVED_BETWEEN_LOCATION_UPDATES = 1;  // meters
+    private static final long MIN_TIME_BETWEEN_LOCATION_UPDATES = 3000;    // milisecs
+    private static final float MIN_DISTANCE_MOVED_BETWEEN_LOCATION_UPDATES = 50;  // meters
     public static final String EXTRA_USER_LATITUDE = "location_latitude";
     public static final String EXTRA_USER_LONGITUDE = "location_longitude";
 
