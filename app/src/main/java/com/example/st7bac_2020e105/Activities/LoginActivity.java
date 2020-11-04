@@ -102,9 +102,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
 
     private ArrayList<VehicleItem> getCustomList() {
     customList = new ArrayList<>();
-        customList.add(new VehicleItem("Vælg køretøj...",0));
-        customList.add(new VehicleItem("Ambulance",R.drawable.ambulance));
-        customList.add(new VehicleItem("Brandbil",R.drawable.brandbil));
+        customList.add(new VehicleItem("Choose Emergency vehicle...",0));
+        customList.add(new VehicleItem("Ambulance",R.drawable.ambulance_noemergency));
+        customList.add(new VehicleItem("Firetruck",R.drawable.firetruck_noemergency));
+        customList.add(new VehicleItem("Medical car",R.drawable.medicalcar_noemergency));
     return customList;
     }
 
@@ -155,7 +156,10 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             if(item.getSpinneritemsName().equals("Ambulance")){
                 Toast.makeText(this, item.getSpinneritemsName(), Toast.LENGTH_SHORT).show();
             }
-            if (item.getSpinneritemsName().equals("Brandbil")){
+            if (item.getSpinneritemsName().equals("Firetruck")){
+                Toast.makeText(this, item.getSpinneritemsName(), Toast.LENGTH_SHORT).show();
+            }
+            if (item.getSpinneritemsName().equals("Medical car")){
                 Toast.makeText(this, item.getSpinneritemsName(), Toast.LENGTH_SHORT).show();
             }
             VehicleChosen = item.getSpinneritemsName();

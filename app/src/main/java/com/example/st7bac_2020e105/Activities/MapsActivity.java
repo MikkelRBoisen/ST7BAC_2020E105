@@ -194,7 +194,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 if(value.vehicleType.equals("Brandbil")) {
                     MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
-                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.brandbil));
+                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.firetruck));
                     mMap.addMarker(FireTruck);
                 }
             }
