@@ -233,7 +233,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(userLocationKnown) {
             if(radius == 500){
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 13));
+                        new LatLng(userLatitude, userLongitude), 15));
             }
             if(radius <= 499){
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -278,7 +278,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 
             }
-            //setUpMap();
+            setUpMap();
         }
     };
 
