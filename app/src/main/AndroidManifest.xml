@@ -23,7 +23,6 @@
 
         <activity android:name=".Activities.MapsActivity" />
         <activity android:name=".Activities.SettingsActivity" />
-        <activity android:name=".Activities.LocationActivity" />
         <activity android:name=".Activities.LoginActivity" />
         <activity android:name=".Activities.EmergencyVehicleLocationActivity" />
         <activity android:name=".Activities.MainActivity">

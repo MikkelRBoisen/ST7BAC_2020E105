@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.widget.Toast;
 
+import com.example.st7bac_2020e105.Alarm;
 import com.example.st7bac_2020e105.Model.VehicleItem;
 import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
@@ -63,10 +64,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double userLatitude;
     private double userLongitude;
     private boolean userLocationKnown = false;
+    private Alarm alarm = new Alarm();
 
     private double databaselatitude;
     private double databaselongtitude;
-
+    private int startalarming = 0;
     private int radiusSettings;
     private int radius = 500;
     HashMap<String, VehicleLocation> map = new HashMap<String, VehicleLocation>();
@@ -187,32 +189,63 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             for (Map.Entry<String, VehicleLocation> item : map.entrySet()) {
                 VehicleLocation value = item.getValue();
                 value.getVehicleType();
+
+//                //Get the current time of the system
+//                long miliSec = System.currentTimeMillis();
+//                //Insert systemCurrentTime to the date format: yyyy-MM-dd HH:mm:sss
+//                String currentDate = dateFormat.format(miliSec);
+//
+//                String databaseTimeSeconds = value.timestamp.substring(0,16);
+//                String systemTimeSeconds = currentDate.substring(0,16);
+//
+//                //https://stackoverflow.com/questions/23283118/comparing-two-time-in-strings
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//                try {
+//                    Date databaseTimeDate = sdf.parse(databaseTimeSeconds);
+//                    Date systemTimeDate = sdf.parse(systemTimeSeconds);
+//
+//                    //Compare time elapsed between the two timestamps
+//                    long elapsed = systemTimeDate.getTime() - databaseTimeDate.getTime();
+//                    //https://stackoverflow.com/questions/4355303/how-can-i-convert-a-long-to-int-in-java
+//                    int convertLongToInt = (int) elapsed;
+//                    //Convert from milliseconds to minutes
+//                    int timeBetweenTimeDates = convertLongToInt/60000;
+//
+//                    //if timestamp from database is more than 5 min older, don't add to map:
+//                    if (timeBetweenTimeDates>5){
+//                        map.remove();
+//                    }
+//
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
                 if(value.vehicleType.equals("Ambulance")) {
                     MarkerOptions AmbulanceVehicle = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
                     AmbulanceVehicle.icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
                     mMap.addMarker(AmbulanceVehicle);
                 }
-                if(value.vehicleType.equals("Brandbil")) {
+                if(value.vehicleType.equals("Firetruck")) {
                     MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
                     FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.firetruck));
                     mMap.addMarker(FireTruck);
                 }
+                if(value.vehicleType.equals("Medical car")) {
+                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
+                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.medicalcar_noemergency));
+                    mMap.addMarker(FireTruck);
+                }
+
+                //Calculating distance between users location and emergency vehicles
+                float[] results = new float[1];
+                Location.distanceBetween(userLatitude,userLongitude,value.latitude,value.longitude,results);
+                float distance = results[0];
+                if(distance <=radius){
+                    startalarming = 1;
+                }
+                else{
+                    startalarming=0;
+                }
             }
-//            {
-//                databaselatitude =  map.values().iterator().next().latitude;
-//                databaselongtitude = map.values().iterator().next().longitude;
-//
-//                if(map.values().iterator().next().vehicleType.equals("Ambulance")) {
-//                    MarkerOptions AmbulanceVehicle = new MarkerOptions().position(new LatLng(databaselatitude, databaselongtitude));
-//                    AmbulanceVehicle.icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
-//                    mMap.addMarker(AmbulanceVehicle);
-//                }
-//                if(map.values().iterator().next().vehicleType.equals("Brandbil")) {
-//                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(databaselatitude, databaselongtitude));
-//                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.brandbil));
-//                    mMap.addMarker(FireTruck);
-//                }
-//            }
             //Create marker
             MarkerOptions Usermarker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
             mMap.addMarker(Usermarker);
@@ -225,7 +258,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //plot in google maps - https://developers.google.com/android/reference/com/google/android/gms/maps/model/Circle
             Circle circle = mMap.addCircle(myCircle);
             circle.setStrokeColor(Color.RED);
-            circle.setFillColor(0x220000FF);
+
+            if(startalarming == 1){
+                circle.setFillColor(0x220000FF);
+                circle.setStrokeColor(Color.RED);
+            }
+            else{
+                circle.setStrokeColor(Color.GREEN);
+            }
             zoomToUser();
         }
     }
@@ -241,11 +281,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             if(radius >= 501 && radius <= 750){
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 14));
+                        new LatLng(userLatitude, userLongitude), 15));
             }
             if(radius >= 751){
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 13));
+                        new LatLng(userLatitude, userLongitude), 14));
             }
 
         } else {
@@ -276,7 +316,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if(userLatitude!=0 && userLongitude!=0) {
                     userLocationKnown = true;
                 }
-                
             }
             setUpMap();
         }
@@ -290,9 +329,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         getMenuInflater().inflate(R.menu.main_menu,menu);
         return super.onCreateOptionsMenu(menu);
     }
+
     //Menu items selected
-
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         //get item id

@@ -20,7 +20,7 @@ import com.example.st7bac_2020e105.Alarm;
 import com.example.st7bac_2020e105.R;
 import com.example.st7bac_2020e105.Service;
 
-public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
+public class SettingsActivity extends AppCompatActivity {
 
     //Inspiration fra:
     //https://www.youtube.com/watch?v=KAx5OAld8Hg&t=301s&ab_channel=WithSam
@@ -51,16 +51,6 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         volumeIndicator = (TextView)findViewById(R.id.txt_volumeIndicator);
         radiusIndicator = (TextView)findViewById(R.id.txt_radiusIndicator);
-
-        // TEST LYD MED KNAP
-        testLydKnap = (Button)findViewById(R.id.btnTestSound);
-        testLydKnap.setOnClickListener(this);
-        //
-
-        // TEST MED NEW ACTIVITY
-        testActivity = (Button)findViewById(R.id.btnTestNewActivity);
-        testActivity.setOnClickListener(this);
-        //
 
         //Safe changes button
         safeButton = (Button)findViewById(R.id.btn_safe_settingsactivity);
@@ -114,25 +104,5 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {            }
         });
-    }
-
-
-
-
-
-    //TEST LYD MED KNAP OG SERVICE
-    @Override
-    public void onClick(View v) {
-        if (v == testLydKnap)
-        {
-            startService(new Intent(this, Service.class));
-            //PlaySound();
-        }
-        //Test new activity
-        if (v == testActivity)
-        {
-            Intent intentNewActivity = new Intent(v.getContext(), LocationActivity.class);
-            v.getContext().startActivity(intentNewActivity);
-        }
     }
 }

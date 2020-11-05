@@ -9,6 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.icu.text.CaseMap;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -50,20 +51,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Beware");
 
-        test1 = (Button)findViewById(R.id.btnTest1);
         test2 = (Button)findViewById(R.id.btnTest2);
-
-        test1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-
-            }
-        });
-
-
-
         test2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

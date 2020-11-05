@@ -106,7 +106,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_vehicle_location);
-
+        setTitle("Alarm");
 
         databaseReference = FirebaseDatabase.getInstance().getReference("Location");
         startStopLocation = findViewById(R.id.btn_startstoplocations);
