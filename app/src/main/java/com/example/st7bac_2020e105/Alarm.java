@@ -7,16 +7,16 @@ public class Alarm {
 
     //https://dzone.com/articles/playing-sounds-android
 
-    MediaPlayer mediaPlayer;
+    MediaPlayer mediaPlayer = null;
 
     public void playAlarm(Context context)
     {
         mediaPlayer = MediaPlayer.create(context, R.raw.alarm);
-        mediaPlayer.setLooping(true);
+        //mediaPlayer.setLooping(true);
         mediaPlayer.start();
     }
 
-    public void stopAlarm()
+    public void stopAlarm(Context context)
     {
         mediaPlayer.stop();
     }

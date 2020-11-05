@@ -16,6 +16,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,8 @@ import android.view.animation.Animation;
 import android.widget.Toast;
 
 import com.example.st7bac_2020e105.Alarm;
+import com.example.st7bac_2020e105.Alarm;
+import com.example.st7bac_2020e105.DistanceCalculatorAlgorithm;
 import com.example.st7bac_2020e105.Model.VehicleItem;
 import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
@@ -54,6 +57,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -80,6 +84,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String todaysDate = dateFormat.format(new Date());
     VehicleLocation vehicleLocation = new VehicleLocation(0,0,"","", defualtDate);
 
+    DistanceCalculatorAlgorithm distanceCalculatorAlgorithm = new DistanceCalculatorAlgorithm();
+    private double distanceBetweenCoordinates = 0;
+    Alarm alarm = new Alarm();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +100,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         databaseReference = FirebaseDatabase.getInstance().getReference("Location");
         ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
 
+        //Alarm broadcast receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("Alarm"));
+
+        //Radius broadcast receiver from SettingsActivity
+        LocalBroadcastManager.getInstance(this).registerReceiver(safeReceiver, new IntentFilter("SafeIntent"));
+
         Intent data = getIntent();
         if(data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)){
             userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
@@ -100,10 +114,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 userLocationKnown = true;
             }
         }
-        radiusSettings = data.getIntExtra("radius",500);
-        if (radiusSettings != radius){
-            radius = radiusSettings;
-        }
+
+//        radiusSettings = data.getIntExtra("radius",500);
+//        if (radiusSettings != radius){
+//            radius = radiusSettings;
+//        }
         setUpMapIfNeeded();
 
 
@@ -162,6 +177,33 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     });
 }
+
+    //Broadcast receiver for Radius from SettingsActivity:
+    private BroadcastReceiver safeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            radiusSettings = intent.getIntExtra("radius",500);
+            if (radiusSettings != radius){
+                radius = radiusSettings;
+                setUpMap();
+            }
+        }
+    };
+
+    //Broadcast receiver for alarm:
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (distanceBetweenCoordinates<=radius)
+            {
+                alarm.playAlarm(MapsActivity.this);
+            }
+            if (distanceBetweenCoordinates>=radius)
+            {
+                alarm.stopAlarm(MapsActivity.this);
+            }
+        }
+    };
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -229,6 +271,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.firetruck));
                     mMap.addMarker(FireTruck);
                 }
+                //Play alarm through broadcast intent if distance between coordinates is bigger than the radius
+                distanceBetweenCoordinates = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude,userLongitude,value.latitude,value.longitude);
+                //if (distanceBetweenCoordinates<=radius)
+                //{
+                    Intent alarmIntent = new Intent("Alarm");
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(alarmIntent);
+               // }
                 if(value.vehicleType.equals("Medical car")) {
                     MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
                     FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.medicalcar_noemergency));
@@ -246,6 +295,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     startalarming=0;
                 }
             }
+
+//            {
+//                databaselatitude =  map.values().iterator().next().latitude;
+//                databaselongtitude = map.values().iterator().next().longitude;
+//
+//                if(map.values().iterator().next().vehicleType.equals("Ambulance")) {
+//                    MarkerOptions AmbulanceVehicle = new MarkerOptions().position(new LatLng(databaselatitude, databaselongtitude));
+//                    AmbulanceVehicle.icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
+//                    mMap.addMarker(AmbulanceVehicle);
+//                }
+//                if(map.values().iterator().next().vehicleType.equals("Brandbil")) {
+//                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(databaselatitude, databaselongtitude));
+//                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.brandbil));
+//                    mMap.addMarker(FireTruck);
+//                }
+//            }
             //Create marker
             MarkerOptions Usermarker = new MarkerOptions().position(new LatLng(userLatitude, userLongitude)).title("You are here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user_car));
             mMap.addMarker(Usermarker);
@@ -269,6 +334,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             zoomToUser();
         }
     }
+
+
+
+
     private void zoomToUser(){
         if(userLocationKnown) {
             if(radius == 500){
@@ -296,6 +365,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(locationUpdateReceiver, new IntentFilter("LOCATION_UPDATE"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, new IntentFilter("Alarm"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(safeReceiver, new IntentFilter("SafeIntent"));
         setUpMapIfNeeded();
     }
 
