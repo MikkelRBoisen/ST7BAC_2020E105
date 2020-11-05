@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private Location userLocation;
     private double latitude, longitude;
-
-    Button test1;
     Button test2;
 
 
@@ -54,14 +52,6 @@ public class MainActivity extends AppCompatActivity {
         setTitle("Beware");
 
         test2 = (Button)findViewById(R.id.btnTest2);
-
-        test1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-            }
-        });
-
         test2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -68,7 +68,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double userLatitude;
     private double userLongitude;
     private boolean userLocationKnown = false;
-    private Alarm alarm = new Alarm();
 
     private double databaselatitude;
     private double databaselongtitude;
@@ -271,6 +270,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.firetruck));
                     mMap.addMarker(FireTruck);
                 }
+                if(value.vehicleType.equals("Medical car")) {
+                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
+                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.medicalcar_noemergency));
+                    mMap.addMarker(FireTruck);
+                }
+
+
+
                 //Play alarm through broadcast intent if distance between coordinates is bigger than the radius
                 distanceBetweenCoordinates = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude,userLongitude,value.latitude,value.longitude);
                 //if (distanceBetweenCoordinates<=radius)
@@ -278,11 +285,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Intent alarmIntent = new Intent("Alarm");
                     LocalBroadcastManager.getInstance(this).sendBroadcast(alarmIntent);
                // }
-                if(value.vehicleType.equals("Medical car")) {
-                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
-                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.medicalcar_noemergency));
-                    mMap.addMarker(FireTruck);
-                }
+
 
                 //Calculating distance between users location and emergency vehicles
                 float[] results = new float[1];
