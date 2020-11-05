@@ -165,7 +165,6 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             VehicleChosen = item.getSpinneritemsName();
         }
     }
-
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 

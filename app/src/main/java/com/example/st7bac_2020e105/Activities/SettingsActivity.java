@@ -1,36 +1,22 @@
 package com.example.st7bac_2020e105.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.example.st7bac_2020e105.Alarm;
 import com.example.st7bac_2020e105.R;
-import com.example.st7bac_2020e105.Service;
 
-public class SettingsActivity extends AppCompatActivity implements View.OnClickListener {
+public class SettingsActivity extends AppCompatActivity {
 
     //Inspiration fra:
     //https://www.youtube.com/watch?v=KAx5OAld8Hg&t=301s&ab_channel=WithSam
-
-
-    //Test knap:
-    //Tilføjet "Implements View.OnClickListenter" - kan fjernes når knappen fjernes..
-    Button testLydKnap;
-    Button testActivity;
-
 
     Button safeButton;
 
@@ -52,24 +38,14 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         volumeIndicator = (TextView)findViewById(R.id.txt_volumeIndicator);
         radiusIndicator = (TextView)findViewById(R.id.txt_radiusIndicator);
 
-        // TEST LYD MED KNAP
-        testLydKnap = (Button)findViewById(R.id.btnTestSound);
-        testLydKnap.setOnClickListener(this);
-        //
-
-        // TEST MED NEW ACTIVITY
-        testActivity = (Button)findViewById(R.id.btnTestNewActivity);
-        testActivity.setOnClickListener(this);
-        //
-
         //Safe changes button
         safeButton = (Button)findViewById(R.id.btn_safe_settingsactivity);
         safeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent radiusIntent =new Intent(SettingsActivity.this, MapsActivity.class);
-                radiusIntent.putExtra("radius",radiusValue);
-                startActivity(radiusIntent);
+                Intent safeIntent = new Intent("SafeIntent").putExtra("radius",radiusValue);
+                LocalBroadcastManager.getInstance(SettingsActivity.this).sendBroadcast(safeIntent);
+                finish();
             }
         });
 
@@ -114,25 +90,5 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {            }
         });
-    }
-
-
-
-
-
-    //TEST LYD MED KNAP OG SERVICE
-    @Override
-    public void onClick(View v) {
-        if (v == testLydKnap)
-        {
-            startService(new Intent(this, Service.class));
-            //PlaySound();
-        }
-        //Test new activity
-        if (v == testActivity)
-        {
-            Intent intentNewActivity = new Intent(v.getContext(), LocationActivity.class);
-            v.getContext().startActivity(intentNewActivity);
-        }
     }
 }

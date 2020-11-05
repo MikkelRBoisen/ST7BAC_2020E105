@@ -58,11 +58,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-
             }
         });
-
-
 
         test2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         toogleTracking();
         updateStatus();
     }
+
     private void toogleTracking() {
 
         if (isTracking) {
@@ -89,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         }
         updateStatus();
     }
+
     private boolean startTracking() {
         try {
             if (locationManager == null) {
@@ -119,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     }
+
     private boolean stopTracking() {
         try {
             try {
@@ -152,12 +152,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void broadcastLocationUpdate(Location location){
         Intent update = new Intent("LOCATION_UPDATE");
         update.putExtra(EXTRA_USER_LATITUDE, location.getLatitude());
         update.putExtra(EXTRA_USER_LONGITUDE, location.getLongitude());
         LocalBroadcastManager.getInstance(this).sendBroadcast(update);
     }
+
     private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
@@ -181,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     };
+
     private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
