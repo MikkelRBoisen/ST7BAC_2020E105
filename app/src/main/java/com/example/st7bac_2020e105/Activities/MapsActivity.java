@@ -20,7 +20,10 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.Animation;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.st7bac_2020e105.Alarm;
@@ -68,7 +71,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double userLatitude;
     private double userLongitude;
     private boolean userLocationKnown = false;
-
+    Button navigation_follow_user;
     private double databaselatitude;
     private double databaselongtitude;
     private int startalarming = 0;
@@ -82,6 +85,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String defualtDate = dateFormat.format(new Date(0));
     String todaysDate = dateFormat.format(new Date());
     VehicleLocation vehicleLocation = new VehicleLocation(0,0,"","", defualtDate);
+    boolean cameraSet = false;
 
     DistanceCalculatorAlgorithm distanceCalculatorAlgorithm = new DistanceCalculatorAlgorithm();
     private double distanceBetweenCoordinates = 0;
@@ -91,7 +95,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
-
         //setting title for MapsActivity
         //https://stackoverflow.com/questions/3975550/android-how-to-change-the-application-title
         setTitle("Maps");
@@ -113,6 +116,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 userLocationKnown = true;
             }
         }
+
+        navigation_follow_user = (Button)findViewById(R.id.navigation_button);
+        navigation_follow_user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
 //        radiusSettings = data.getIntExtra("radius",500);
 //        if (radiusSettings != radius){
@@ -195,11 +206,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onReceive(Context context, Intent intent) {
             if (distanceBetweenCoordinates<=radius)
             {
-                alarm.playAlarm(MapsActivity.this);
+                //alarm.playAlarm(MapsActivity.this);
             }
             if (distanceBetweenCoordinates>=radius)
             {
-                alarm.stopAlarm(MapsActivity.this);
+               // alarm.stopAlarm(MapsActivity.this);
             }
         }
     };
@@ -272,7 +283,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 if(value.vehicleType.equals("Medical car")) {
                     MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
-                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.medicalcar_noemergency));
+                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.laegebil));
                     mMap.addMarker(FireTruck);
                 }
 
@@ -330,36 +341,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if(startalarming == 1){
                 circle.setFillColor(0x220000FF);
                 circle.setStrokeColor(Color.RED);
+                zoomToUser();
             }
             else{
                 circle.setStrokeColor(Color.GREEN);
             }
-            zoomToUser();
         }
     }
 
-
-
-
-    private void zoomToUser(){
+    private void zoomToUser( ){
         if(userLocationKnown) {
-            if(radius == 500){
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 15));
-            }
-            if(radius <= 499){
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 17));
-            }
-            if(radius >= 501 && radius <= 750){
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 15));
-            }
-            if(radius >= 751){
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(userLatitude, userLongitude), 14));
-            }
+                if(radius == 500){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(userLatitude, userLongitude), 15));
+                }
+                if(radius <= 499){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(userLatitude, userLongitude), 17));
+                    cameraSet =true;
 
+                }
+                if(radius >= 501 && radius <= 750){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(userLatitude, userLongitude), 15));
+                    cameraSet =true;
+
+                }
+                if(radius >= 751){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(userLatitude, userLongitude), 14));
+                    cameraSet =true;
+
+                }
         } else {
             Toast.makeText(getApplicationContext(), "User location unknown", Toast.LENGTH_SHORT).show();
         }
