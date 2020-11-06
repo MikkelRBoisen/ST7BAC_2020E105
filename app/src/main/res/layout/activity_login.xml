@@ -24,15 +24,15 @@
         android:layout_width="260dp"
         android:layout_height="45dp"
         android:layout_marginTop="10dp"
+        android:background="#A94B7A76"
         android:ems="10"
         android:hint=" Brugernavn"
-        android:background="#A94B7A76"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
         android:textColorHint="#000000"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner" />
 
     <EditText
         android:id="@+id/edt_Password"
