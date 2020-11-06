@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     customList = new ArrayList<>();
         customList.add(new VehicleItem("Choose Emergency vehicle...",0));
         customList.add(new VehicleItem("Ambulance",R.drawable.ambulance_noemergency));
-        customList.add(new VehicleItem("Firetruck",R.drawable.firetruck));
+        customList.add(new VehicleItem("Firetruck",R.drawable.firetruck_noemergency));
         customList.add(new VehicleItem("Medical car",R.drawable.medicalcar_noemergency));
     return customList;
     }
