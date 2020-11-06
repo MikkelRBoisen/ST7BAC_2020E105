@@ -2,6 +2,7 @@ package com.example.st7bac_2020e105.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -55,6 +56,8 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         username = (EditText)findViewById(R.id.edt_Username);
         password = (EditText)findViewById(R.id.edt_Password);
         loginButton = (Button)findViewById(R.id.btn_Login);
+
+
 
         //TEST
         automatiskLoginKnap = (Button)findViewById(R.id.btn_AutomaticLogin);

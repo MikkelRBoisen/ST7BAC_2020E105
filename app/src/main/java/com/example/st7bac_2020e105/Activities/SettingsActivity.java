@@ -18,6 +18,8 @@ public class SettingsActivity extends AppCompatActivity {
     //Inspiration fra:
     //https://www.youtube.com/watch?v=KAx5OAld8Hg&t=301s&ab_channel=WithSam
 
+
+
     Button safeButton;
 
     //Adjusting volume
@@ -35,8 +37,13 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        setTitle("Settings");
+
         volumeIndicator = (TextView)findViewById(R.id.txt_volumeIndicator);
         radiusIndicator = (TextView)findViewById(R.id.txt_radiusIndicator);
+
+        volumeIndicator.setText("%");
+        radiusIndicator.setText("meter");
 
         //Safe changes button
         safeButton = (Button)findViewById(R.id.btn_safe_settingsactivity);

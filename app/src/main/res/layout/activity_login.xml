@@ -21,11 +21,12 @@
 
     <EditText
         android:id="@+id/edt_Username"
-        android:layout_width="210dp"
+        android:layout_width="260dp"
         android:layout_height="45dp"
         android:layout_marginTop="10dp"
         android:ems="10"
-        android:hint="Brugernavn"
+        android:hint=" Brugernavn"
+        android:background="#A94B7A76"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,17 +36,19 @@
 
     <EditText
         android:id="@+id/edt_Password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="260dp"
+        android:layout_height="45dp"
         android:layout_marginTop="10dp"
         android:ems="10"
-        android:hint="Adgangskode"
+        android:hint=" Adgangskode"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edt_Username"
         android:textColor="#000000"
         android:textColorHint="#000000"
+        android:background="#A94B7A76"
+
         />
 
     <Button
@@ -111,14 +114,15 @@
 
     <Spinner
         android:id="@+id/spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="260dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="50dp"
-        android:layout_marginLeft="50dp"
-        app:layout_constraintTop_toBottomOf="@+id/edt_Password"
+        android:background="#A94B7A76"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.748"
 
-        />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_Password" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

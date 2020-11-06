@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.EmergencyVehicleLocationActivity">
+    tools:context=".Activities.EmergencyVehicleLocationActivity"
+    android:background="@color/colorPrimary"
+    >
+
 
     <ImageView
         android:id="@+id/img_staticMaps"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:background="@drawable/staticmapsimage"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/txt_info_emergencyvehiclelocation"
         app:layout_constraintEnd_toEndOf="parent"

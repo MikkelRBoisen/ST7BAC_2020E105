@@ -332,7 +332,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 circle.setStrokeColor(Color.RED);
             }
             else{
-                circle.setStrokeColor(Color.GREEN);
+                int strokecolor = Color.parseColor("#07675E");
+                circle.setStrokeColor(strokecolor);
             }
             zoomToUser();
         }

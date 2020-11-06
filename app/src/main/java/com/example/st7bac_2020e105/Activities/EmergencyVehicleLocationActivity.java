@@ -9,8 +9,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +24,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class EmergencyVehicleLocationActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -55,6 +61,9 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
 
     public String username;
 
+    ImageView mapImage;
+    Integer[] image = {R.drawable.hiclipart, R.drawable.hiclipart1,R.drawable.hiclipart2, R.drawable.hiclipart3};
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +85,10 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         infoText = findViewById(R.id.txt_info_emergencyvehiclelocation);
         lati = (TextView) findViewById(R.id.txtLat);
         longi = (TextView) findViewById(R.id.txtLong);
+
+        mapImage = (ImageView)findViewById(R.id.img_staticMaps);
+        mapImage.setImageResource(R.drawable.hiclipart);
+
 
         Intent data = getIntent();
         vehicleType = getIntent().getStringExtra("Vehicle");
@@ -103,6 +116,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                 greenButtonIsVisible = false;
                 infoText.setText(R.string.txt_info_stop);
                 writeToFirebase = true;
+                switchPhotos();
             }
             else {
                 if (startStopLocation != null) {
@@ -110,9 +124,33 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
                     greenButtonIsVisible = true;
                     infoText.setText(R.string.txt_info_start);
                     writeToFirebase = false;
+                    mapImage.setImageResource(R.drawable.hiclipart);
+                    stopTimer();
                 }
             }
         }
+    }
+
+
+    //Loop the image to represent data upload on WIFI icon:
+    private int position = -1;
+    Timer timer = new Timer();
+    private void switchPhotos() {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                position++;
+                if (position >= image.length)
+
+                    position = 0;
+                    mapImage.setImageResource(image[position]);
+            }
+        },0,800);
+    }
+    private void stopTimer()
+    {
+        this.timer.cancel();
     }
 
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
