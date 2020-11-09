@@ -220,11 +220,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             {
 
                 //alarm.playAlarm(MapsActivity.this);
-                alarm.playAlarm(MapsActivity.this);
+                //alarm.playAlarm(MapsActivity.this);
             }
             if (distanceBetweenCoordinates>=radius)
             {
-                alarm.stopAlarm(MapsActivity.this);
+                //alarm.stopAlarm(MapsActivity.this);
             }
         }
     };
