@@ -218,7 +218,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onReceive(Context context, Intent intent) {
             if (distanceBetweenCoordinates<=radius)
             {
-
+                
                 //alarm.playAlarm(MapsActivity.this);
                 alarm.playAlarm(MapsActivity.this);
             }
