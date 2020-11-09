@@ -133,6 +133,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         navigation_follow_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                zoomToUser();
             }
         });
 
@@ -309,7 +310,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 distanceBetweenCoordinates = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude,userLongitude,value.latitude,value.longitude);
                     Intent alarmIntent = new Intent("Alarm");
                     LocalBroadcastManager.getInstance(this).sendBroadcast(alarmIntent);
-                
+
                 //second hashmap containing only vehicles within raidus distance for controlling "circle-alarm"-plot
                 if(distanceBetweenCoordinates <= radius){
                     alarmingmap.put(value.userId,value);
