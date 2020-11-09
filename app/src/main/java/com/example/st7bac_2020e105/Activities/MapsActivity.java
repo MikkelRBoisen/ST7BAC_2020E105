@@ -87,6 +87,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int radiusSettings;
     private int radius = 500;
     HashMap<String, VehicleLocation> map = new HashMap<String, VehicleLocation>();
+    HashMap<String, VehicleLocation> alarmingmap = new HashMap<String, VehicleLocation>();
 
 
     private DatabaseReference databaseReference;
@@ -304,14 +305,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 
 
-
                 //Play alarm through broadcast intent if distance between coordinates is bigger than the radius
                 distanceBetweenCoordinates = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude,userLongitude,value.latitude,value.longitude);
-                //if (distanceBetweenCoordinates<=radius)
-                //{
                     Intent alarmIntent = new Intent("Alarm");
                     LocalBroadcastManager.getInstance(this).sendBroadcast(alarmIntent);
-               // }
+                
+                //second hashmap containing only vehicles within raidus distance for controlling "circle-alarm"-plot
+                if(distanceBetweenCoordinates <= radius){
+                    alarmingmap.put(value.userId,value);
+                }
+                else{
+                    alarmingmap.remove(value.userId,value);
+                }
 
 
                 //Calculating distance between users location and emergency vehicles
@@ -356,10 +361,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             zoomToUser();
             //setting up notification
 
-            if(startalarming == 1){
+            if(!alarmingmap.isEmpty()){
                 circle.setFillColor(0x220000FF);
                 circle.setStrokeColor(Color.RED);
-
 
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                     NotificationChannel channel = new NotificationChannel("My Noticiation","my notification",NotificationManager.IMPORTANCE_LOW);
