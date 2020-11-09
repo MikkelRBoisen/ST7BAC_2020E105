@@ -21,6 +21,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
@@ -32,6 +34,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.st7bac_2020e105.Alarm;
@@ -64,6 +67,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.clustering.ClusterManager;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,6 +75,7 @@ import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -97,7 +102,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     VehicleLocation vehicleLocation = new VehicleLocation(0,0,"","", defualtDate);
     boolean cameraSet = false;
 
-    TextToSpeech textToSpeech;
+    private TextToSpeech textToSpeech;
+    String address;
 
     DistanceCalculatorAlgorithm distanceCalculatorAlgorithm = new DistanceCalculatorAlgorithm();
     private double distanceBetweenCoordinates = 0;
@@ -220,7 +226,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onReceive(Context context, Intent intent) {
             if (distanceBetweenCoordinates<=radius)
             {
-
+                
                 //alarm.playAlarm(MapsActivity.this);
                 //alarm.playAlarm(MapsActivity.this);
             }
@@ -257,7 +263,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.clear();
 
             for (Map.Entry<String, VehicleLocation> item : map.entrySet()) {
-                VehicleLocation value = item.getValue();
+                final VehicleLocation value = item.getValue();
                 value.getVehicleType();
 
 //                //Get the current time of the system
@@ -318,6 +324,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 else{
                     alarmingmap.remove(value.userId,value);
                 }
+
+
+                //Get the address from coordinates:
+                Geocoder geocoder;
+                final List<Address> addresses;
+                geocoder = new Geocoder(this, Locale.getDefault());
+
+                try {
+                    addresses = geocoder.getFromLocation(value.latitude, value.longitude, 1);
+                    address = addresses.get(0).getAddressLine(0);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //text to speech the address and vehicle type
+                textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int status) {
+                        if (status == TextToSpeech.SUCCESS)
+                        {
+                            textToSpeech.setLanguage(Locale.US);
+                            String saySomething = "Beware of the "+ value.vehicleType + " on address "+address;
+                            textToSpeech.speak(saySomething, TextToSpeech.QUEUE_ADD, null);
+                        }
+                    }
+                });
+
+
 
 
                 //Calculating distance between users location and emergency vehicles
