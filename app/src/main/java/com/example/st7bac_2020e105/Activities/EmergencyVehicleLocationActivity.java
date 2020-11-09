@@ -170,6 +170,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
 
                     vehicleLocation.setUserId(username);
 
+                    todaysDate = dateFormat.format(new Date());
                     vehicleLocation.setTimestamp(todaysDate);
 
                     databaseReference.child(username).push().setValue(vehicleLocation);
