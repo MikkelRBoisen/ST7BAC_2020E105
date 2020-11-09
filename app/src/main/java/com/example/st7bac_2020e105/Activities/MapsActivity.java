@@ -1,14 +1,20 @@
 package com.example.st7bac_2020e105.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +23,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -63,6 +71,7 @@ import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -86,6 +95,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String todaysDate = dateFormat.format(new Date());
     VehicleLocation vehicleLocation = new VehicleLocation(0,0,"","", defualtDate);
     boolean cameraSet = false;
+
+    TextToSpeech textToSpeech;
 
     DistanceCalculatorAlgorithm distanceCalculatorAlgorithm = new DistanceCalculatorAlgorithm();
     private double distanceBetweenCoordinates = 0;
@@ -121,7 +132,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         navigation_follow_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
             }
         });
 
@@ -140,6 +150,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 final String key = ds.getKey();
 
                 databaseReference.child(key).orderByChild(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         VehicleLocation vehicleLocationzz = new VehicleLocation();
@@ -190,6 +201,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //Broadcast receiver for Radius from SettingsActivity:
     private BroadcastReceiver safeReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onReceive(Context context, Intent intent) {
             radiusSettings = intent.getIntExtra("radius",500);
@@ -206,6 +218,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onReceive(Context context, Intent intent) {
             if (distanceBetweenCoordinates<=radius)
             {
+
                 //alarm.playAlarm(MapsActivity.this);
             }
             if (distanceBetweenCoordinates>=radius)
@@ -223,6 +236,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -233,6 +247,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void setUpMap() {
         if(userLocationKnown) {
             //Clear map from old markers
@@ -337,15 +352,43 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //plot in google maps - https://developers.google.com/android/reference/com/google/android/gms/maps/model/Circle
             Circle circle = mMap.addCircle(myCircle);
             circle.setStrokeColor(Color.RED);
+            zoomToUser();
+            //setting up notification
 
             if(startalarming == 1){
                 circle.setFillColor(0x220000FF);
                 circle.setStrokeColor(Color.RED);
-                zoomToUser();
+
+
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                    NotificationChannel channel = new NotificationChannel("My Noticiation","my notification",NotificationManager.IMPORTANCE_LOW);
+                    NotificationManager manager = getSystemService(NotificationManager.class);
+                    manager.createNotificationChannel(channel);
+                }
+
+                Intent intent=new Intent(getApplicationContext(),MapsActivity.class);
+                String CHANNEL_ID="Alarm";
+                NotificationChannel notificationChannel=new NotificationChannel(CHANNEL_ID,"Udrykning",NotificationManager.IMPORTANCE_LOW);
+                PendingIntent pendingIntent=PendingIntent.getActivity(getApplicationContext(),1,intent,0);
+                Notification notification=new Notification.Builder(getApplicationContext(),CHANNEL_ID)
+                        .setContentText("Der er en udrykning i nærheden af dig. Se hvor...")
+                        .setContentTitle("Udrykning indenfor " +radius+" meter")
+                        .setContentIntent(pendingIntent)
+                        .addAction(android.R.drawable.sym_action_chat,"Beware",pendingIntent)
+                        .setChannelId(CHANNEL_ID)
+                        .setSmallIcon(R.mipmap.ic_launcher_round)
+                        .build();
+
+                NotificationManager notificationManager=(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.createNotificationChannel(notificationChannel);
+                notificationManager.notify(96,notification);
+
             }
             else{
                 int strokecolor = Color.parseColor("#07675E");
                 circle.setStrokeColor(strokecolor);
+                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(96);
             }
         }
     }
@@ -395,6 +438,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onReceive(Context context, Intent data) {
             //Toast.makeText(getApplicationContext(), "Got location update", Toast.LENGTH_SHORT).show();
