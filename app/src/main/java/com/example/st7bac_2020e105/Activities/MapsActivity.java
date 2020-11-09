@@ -135,6 +135,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         navigation_follow_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                zoomToUser();
             }
         });
 
