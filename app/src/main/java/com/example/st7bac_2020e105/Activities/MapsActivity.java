@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.st7bac_2020e105.DistanceCalculatorAlgorithm;
+import com.example.st7bac_2020e105.Model.TimeCalculator;
 import com.example.st7bac_2020e105.Model.VehicleItem;
 import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
@@ -89,6 +90,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int radius = 500;
     HashMap<String, VehicleLocation> map = new HashMap<String, VehicleLocation>();
     HashMap<String, VehicleLocation> alarmingmap = new HashMap<String, VehicleLocation>();
+    TimeCalculator timeCalculator = new TimeCalculator();
 
 
     private DatabaseReference databaseReference;
@@ -153,39 +155,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        VehicleLocation vehicleLocationzz = new VehicleLocation();
-                        vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
-
-                        //Get the current time of the system
-                        long miliSec = System.currentTimeMillis();
-                        //Insert systemCurrentTime to the date format: yyyy-MM-dd HH:mm:sss
-                        String currentDate = dateFormat.format(miliSec);
-
-                        String databaseTimeSeconds = vehicleLocationzz.timestamp.substring(0,16);
-                        String systemTimeSeconds = currentDate.substring(0,16);
-
-                        //https://stackoverflow.com/questions/23283118/comparing-two-time-in-strings
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                        try {
-                            Date databaseTimeDate = sdf.parse(databaseTimeSeconds);
-                            Date systemTimeDate = sdf.parse(systemTimeSeconds);
-
-                            //Compare time elapsed between the two timestamps
-                            long elapsed = systemTimeDate.getTime() - databaseTimeDate.getTime();
-                            //https://stackoverflow.com/questions/4355303/how-can-i-convert-a-long-to-int-in-java
-                            int convertLongToInt = (int) elapsed;
-                            //Convert from milliseconds to minutes
-                            int timeBetweenTimeDates = convertLongToInt/60000;
-
-                            //if timestamp from database is more than 5 min older, don't add to map:
-                            if (timeBetweenTimeDates<=5)
-                            {
-                                map.put(snapshot.getKey(), vehicleLocationzz);
-                                setUpMap();
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
+                        if(timeCalculator.TimeCalculator(snapshot)<=5 && timeCalculator.TimeCalculator(snapshot) >=0){
+                            map.put(snapshot.getKey(),snapshot.getChildren().iterator().next().getValue(VehicleLocation.class));
                         }
+                        else{
+                            map.remove(snapshot.getKey());
+                        }
+                        setUpMap();
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
@@ -238,27 +214,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if(userLocationKnown) {
             //Clear map from old markers
             mMap.clear();
-
             for (Map.Entry<String, VehicleLocation> item : map.entrySet()) {
                 final VehicleLocation value = item.getValue();
                 value.getVehicleType();
-
-                if(value.vehicleType.equals("Ambulance")) {
-                    MarkerOptions AmbulanceVehicle = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
-                    AmbulanceVehicle.icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
-                    mMap.addMarker(AmbulanceVehicle);
-                }
-                if(value.vehicleType.equals("Firetruck")) {
-                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
-                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.firetruck));
-                    mMap.addMarker(FireTruck);
-                }
-                if(value.vehicleType.equals("Medical car")) {
-                    MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
-                    FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.laegebil));
-                    mMap.addMarker(FireTruck);
-                }
-
+                    if(value.vehicleType.equals("Ambulance")) {
+                        MarkerOptions AmbulanceVehicle = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
+                        AmbulanceVehicle.icon(BitmapDescriptorFactory.fromResource(R.drawable.ambulance));
+                        mMap.addMarker(AmbulanceVehicle);
+                    }
+                    if(value.vehicleType.equals("Firetruck")) {
+                        MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
+                        FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.firetruck));
+                        mMap.addMarker(FireTruck);
+                    }
+                    if(value.vehicleType.equals("Medical car")) {
+                        MarkerOptions FireTruck = new MarkerOptions().position(new LatLng(value.latitude, value.longitude));
+                        FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.laegebil));
+                        mMap.addMarker(FireTruck);
+                    }
 
                 //Play alarm through broadcast intent if distance between coordinates is bigger than the radius
                 distanceBetweenCoordinates = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude,userLongitude,value.latitude,value.longitude);
@@ -271,30 +244,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     alarmingmap.remove(value.userId,value);
                 }
 
-                //Get the address from coordinates:
-                Geocoder geocoder;
-                final List<Address> addresses;
-                geocoder = new Geocoder(this, Locale.getDefault());
-                try {
-                    addresses = geocoder.getFromLocation(value.latitude, value.longitude, 1);
-                    address = addresses.get(0).getAddressLine(0);
-                    //Removing street number, postal code, city name and country:
-                    addressCorrect = address.split(",")[0];
-                    finalAddress=addressCorrect.replaceAll("[^A-Åa-å + //]", "");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+//                //Get the address from coordinates:
+//                Geocoder geocoder;
+//                final List<Address> addresses;
+//                geocoder = new Geocoder(this, Locale.getDefault());
+//                if(value != null) {
+//                    try {
+//                        addresses = geocoder.getFromLocation(value.latitude, value.longitude, 1);
+//                        address = addresses.get(0).getAddressLine(0);
+//                        //Removing street number, postal code, city name and country:
+//                        addressCorrect = address.split(",")[0];
+//                        finalAddress = addressCorrect.replaceAll("[^A-Åa-å + //]", "");
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
 
                 //Calculating distance between users location and emergency vehicles
-//                float[] results = new float[1];
-//                Location.distanceBetween(userLatitude,userLongitude,value.latitude,value.longitude,results);
-//                float distance = results[0];
-//                if(distance <=radius){
-//                    startalarming = 1;
-//                }
-//                else{
-//                    startalarming=0;
-//                }
+                float[] results = new float[1];
+                Location.distanceBetween(userLatitude,userLongitude,value.latitude,value.longitude,results);
+                float distance = results[0];
+                if(distance <=radius){
+                    startalarming = 1;
+                }
+                else{
+                    startalarming=0;
+                }
             }
 
             //Create marker
