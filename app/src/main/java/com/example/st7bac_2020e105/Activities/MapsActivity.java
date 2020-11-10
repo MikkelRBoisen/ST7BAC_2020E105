@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.st7bac_2020e105.DistanceCalculatorAlgorithm;
+import com.example.st7bac_2020e105.Model.TimeCalculator;
 import com.example.st7bac_2020e105.Model.VehicleItem;
 import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
@@ -89,6 +90,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private int radius = 500;
     HashMap<String, VehicleLocation> map = new HashMap<String, VehicleLocation>();
     HashMap<String, VehicleLocation> alarmingmap = new HashMap<String, VehicleLocation>();
+    TimeCalculator timeCalculator = new TimeCalculator();
 
 
     private DatabaseReference databaseReference;
@@ -263,7 +265,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     FireTruck.icon(BitmapDescriptorFactory.fromResource(R.drawable.laegebil));
                     mMap.addMarker(FireTruck);
                 }
-
 
                 //Play alarm through broadcast intent if distance between coordinates is bigger than the radius
                 distanceBetweenCoordinates = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude,userLongitude,value.latitude,value.longitude);
