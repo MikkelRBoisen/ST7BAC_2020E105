@@ -183,6 +183,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 map.put(snapshot.getKey(), vehicleLocationzz);
                                 setUpMap();
                             }
+                            if (timeBetweenTimeDates > 5)
+                            {
+                                map.remove(snapshot.getKey());
+                                setUpMap();
+                            }
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -363,13 +368,27 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onInit(int status) {
                     if (status == TextToSpeech.SUCCESS)
                     {
-                        textToSpeech.setLanguage(Locale.US);
+                        //På dansk:
+                        Locale loc = new Locale("da","DK");
+                        textToSpeech.setLanguage(loc);
 
+                        /** På engelsk:
+                        //textToSpeech.setLanguage(Locale.ENGLISH); */
 
-                        double speachrate = 0.8;
+                        double speachrate = 0.85;
                         float speachrateFloat = (float)speachrate;
                         textToSpeech.setSpeechRate(speachrateFloat);
-                        String saySomething = "Beware of the "+ alarmingmap.values().iterator().next().vehicleType + " at " + finalAddress;
+
+                        //Calculate distance from alarmingmap. Convert from double to integer, to be read out loud:
+                        double distanceEmegencyCar = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude, userLongitude, alarmingmap.values().iterator().next().latitude, alarmingmap.values().iterator().next().longitude);
+                        int readDistance = (int)Math.round(distanceEmegencyCar);
+
+                        //På dansk:
+                        String saySomething = "Vær opmærksom på "+ alarmingmap.values().iterator().next().vehicleType + " ved " + finalAddress + " om " + readDistance + " meter";
+
+                        /** På engelsk:
+                        String saySomething = "Beware of the "+ alarmingmap.values().iterator().next().vehicleType + " at " + finalAddress + " at " + readDistance + " meters"; */
+
                         textToSpeech.speak(saySomething, TextToSpeech.QUEUE_ADD, null);
                         count++;
                     }
