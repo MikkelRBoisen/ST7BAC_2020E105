@@ -2,7 +2,6 @@ package com.example.st7bac_2020e105.Activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -58,8 +57,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         loginButton = (Button)findViewById(R.id.btn_Login);
 
 
-
-        //TEST
+        //TEST - automatically type the correct login for test
         automatiskLoginKnap = (Button)findViewById(R.id.btn_AutomaticLogin);
         automatiskLoginKnap.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,16 +67,14 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
             }
         });
 
-        //https://www.youtube.com/watch?v=UUGipy7h2l8
+        // inspired by https://www.youtube.com/watch?v=UUGipy7h2l8
         //inflate spinner
         vehicleSpinner = findViewById(R.id.spinner);
         customList = getCustomList();
         VehicleItemAdapter adapter = new VehicleItemAdapter(this, customList);
-        //if (vehicleSpinner == null) {
-            vehicleSpinner.setAdapter(adapter);
-            vehicleSpinner.setOnItemSelectedListener(this);
-            vehicleSpinner.setSelection(0,false);
-        //}
+        vehicleSpinner.setAdapter(adapter);
+        vehicleSpinner.setOnItemSelectedListener(this);
+        vehicleSpinner.setSelection(0,false);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,24 +84,24 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
                 String passwordLogin = password.getText().toString();
 
                 if (!Patterns.EMAIL_ADDRESS.matcher(emaillogin).matches()) {
-                    //invalid email
+                    // invalid email
                     username.setError("Invalid username");
                     username.setFocusable(true);
                 }
                 else{
-                    //valid email
+                    // valid email
                     loginUser(emaillogin,passwordLogin, VehicleChosen);
                 }
             }
         });
-
         pd = new ProgressDialog(this);
         pd.setMessage("Logging in...");
     }
 
+    // Dropdown menu containing an arraylist of vehicletypes
     private ArrayList<VehicleItem> getCustomList() {
     customList = new ArrayList<>();
-        customList.add(new VehicleItem("Choose Emergency vehicle...",0));
+        customList.add(new VehicleItem(getString(R.string.chooseVehicleType),0));
         customList.add(new VehicleItem("Ambulance",R.drawable.ambulance_noemergency));
         customList.add(new VehicleItem("Firetruck",R.drawable.firetruck_noemergency));
         customList.add(new VehicleItem("Medical car",R.drawable.medicalcar_noemergency));
@@ -145,6 +141,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     }
 
 
+    // OnItemSelected dropdown menu for vehicletypes
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
         try {

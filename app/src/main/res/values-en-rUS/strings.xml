@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="loginBtn">Log in</string>
+    <string name="textView_volume">Sound volume</string>
+    <string name="safe_button">Safe changes</string>
+    <string name="txt_info_start">Click on button to start an emergency</string>
+    <string name="txt_info_stop">Click on button to stop an emegency</string>
+    <string name="txt_latitude">Latitude</string>
+    <string name="txt_longitude">Longitude</string>
+    <string name="btn_logout_text">Log out</string>
+    <string name="loginInfoText">Login for emegencypersonale</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="maps">Maps</string>
+    <string name="chooseVehicleType">Choose vehicle</string>
+    <string name="settings">Settings</string>
+    <string name="login">Emergency personale login</string>
+    <string name="logout">Log out</string>
+    <string name="startBeware">Let\'s Beware</string>
+    <string name="textView_radius">Radius</string>
+</resources>
