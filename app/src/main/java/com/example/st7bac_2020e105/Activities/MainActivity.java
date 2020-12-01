@@ -60,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setTitle("Beware");
 
-
-
-
         test2 = (Button)findViewById(R.id.btnTest2);
         test2.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
