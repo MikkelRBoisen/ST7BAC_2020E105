@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
@@ -17,8 +19,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     //Inspiration fra:
     //https://www.youtube.com/watch?v=KAx5OAld8Hg&t=301s&ab_channel=WithSam
-
-
 
     Button safeButton;
 
@@ -42,8 +42,6 @@ public class SettingsActivity extends AppCompatActivity {
         volumeIndicator = (TextView)findViewById(R.id.txt_volumeIndicator);
         radiusIndicator = (TextView)findViewById(R.id.txt_radiusIndicator);
 
-        volumeIndicator.setText("%");
-        radiusIndicator.setText("meter");
 
         //Safe changes button
         safeButton = (Button)findViewById(R.id.btn_safe_settingsactivity);
@@ -61,10 +59,10 @@ public class SettingsActivity extends AppCompatActivity {
         int MAX_VOLUME = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 
-
         volume = (SeekBar)findViewById(R.id.seekBar_volume_settingsactivity);
         volume.setMax(MAX_VOLUME);
         volume.setProgress(currentVolume);
+        volumeIndicator.setText(currentVolume + " %");
 
         volume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -83,7 +81,12 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         radius = (SeekBar)findViewById(R.id.seekBar_radius_settingsactivity);
+        Intent getRadiusIntent = getIntent();
+        int radiusIntent = getRadiusIntent.getIntExtra("RadiusIntent", 500);
+        radius.setMax(0);
         radius.setMax(1000);
+        radius.setProgress(radiusIntent);
+        radiusIndicator.setText(radiusIntent + " meter");
         radius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

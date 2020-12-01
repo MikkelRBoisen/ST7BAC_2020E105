@@ -17,6 +17,7 @@
         android:layout_marginBottom="15dp"
         android:text="@string/textView_volume"
         android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/seekBar_volume_settingsactivity"
         app:layout_constraintStart_toEndOf="@+id/imageVolume" />
 
@@ -29,6 +30,7 @@
         android:layout_marginBottom="15dp"
         android:text="@string/textView_radius"
         android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/seekBar_radius_settingsactivity"
         app:layout_constraintStart_toEndOf="@+id/imageRadius" />
 
@@ -39,9 +41,10 @@
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="150dp"
-        android:background="#A94B7A76"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
+        android:background="#A94B7A76"
+        android:thumbTint="@color/colorButton"
         android:max="100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,6 +55,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#A94B7A76"
+        android:thumbTint="@color/colorButton"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="150dp"
@@ -107,7 +111,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="15dp"
-        android:text="TextView"
+        android:textSize="20dp"
         app:layout_constraintBottom_toTopOf="@+id/seekBar_volume_settingsactivity"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -118,7 +122,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginBottom="15dp"
-        android:text="TextView"
+        android:textSize="20dp"
         app:layout_constraintBottom_toTopOf="@+id/seekBar_radius_settingsactivity"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -3,14 +3,8 @@ package com.example.st7bac_2020e105.Activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.fragment.app.FragmentActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.Manifest;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,32 +13,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.st7bac_2020e105.DistanceCalculatorAlgorithm;
 import com.example.st7bac_2020e105.Model.TimeCalculator;
-import com.example.st7bac_2020e105.Model.VehicleItem;
 import com.example.st7bac_2020e105.Model.VehicleLocation;
 import com.example.st7bac_2020e105.R;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -53,27 +37,19 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.maps.android.clustering.ClusterManager;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.EventListener;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,19 +61,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double userLongitude;
     private boolean userLocationKnown = false;
     Button navigation_follow_user;
-    private int startalarming = 0;
     private int radiusSettings;
     private int radius = 500;
     HashMap<String, VehicleLocation> map = new HashMap<String, VehicleLocation>();
     HashMap<String, VehicleLocation> alarmingmap = new HashMap<String, VehicleLocation>();
-    TimeCalculator timeCalculator = new TimeCalculator();
-
 
     private DatabaseReference databaseReference;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:sss");
-    String defualtDate = dateFormat.format(new Date(0));
-    String todaysDate = dateFormat.format(new Date());
-    VehicleLocation vehicleLocation = new VehicleLocation(0,0,"","", defualtDate);
     boolean cameraSet = false;
 
     private TextToSpeech textToSpeech;
@@ -106,9 +75,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String finalAddress;
     private int count = 0;
 
-
     DistanceCalculatorAlgorithm distanceCalculatorAlgorithm = new DistanceCalculatorAlgorithm();
     private double distanceBetweenCoordinates = 0;
+
+    TimeCalculator timeCalculator = new TimeCalculator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,10 +86,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_location);
         //setting title for MapsActivity
         //https://stackoverflow.com/questions/3975550/android-how-to-change-the-application-title
-        setTitle("Maps");
+        setTitle(getString(R.string.maps));
 
         databaseReference = FirebaseDatabase.getInstance().getReference("Location");
-        ArrayList<VehicleLocation> vehicleLocationArray = new ArrayList<>();
 
         //Radius broadcast receiver from SettingsActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(safeReceiver, new IntentFilter("SafeIntent"));
@@ -143,49 +112,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         setUpMapIfNeeded();
 
-
+        // Read data from Firebase onDataChange
         databaseReference.addValueEventListener(new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
             for (DataSnapshot ds : snapshot.getChildren())
             {
+                // Retrieve all keys in database:
                 final String key = ds.getKey();
-
+                // Run trough the last child in each key:
                 databaseReference.child(key).orderByChild(key).limitToLast(1).addValueEventListener(new ValueEventListener() {
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        VehicleLocation vehicleLocationzz = new VehicleLocation();
-                        vehicleLocationzz = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
 
-                        //Get the current time of the system
-                        long miliSec = System.currentTimeMillis();
-                        //Insert systemCurrentTime to the date format: yyyy-MM-dd HH:mm:sss
-                        String currentDate = dateFormat.format(miliSec);
-
-                        String databaseTimeSeconds = vehicleLocationzz.timestamp.substring(0,16);
-                        String systemTimeSeconds = currentDate.substring(0,16);
-
-                        //https://stackoverflow.com/questions/23283118/comparing-two-time-in-strings
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                        VehicleLocation vehicleLocations;
+                        vehicleLocations = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
                         try {
-                            Date databaseTimeDate = sdf.parse(databaseTimeSeconds);
-                            Date systemTimeDate = sdf.parse(systemTimeSeconds);
-
-                            //Compare time elapsed between the two timestamps
-                            long elapsed = systemTimeDate.getTime() - databaseTimeDate.getTime();
-                            //https://stackoverflow.com/questions/4355303/how-can-i-convert-a-long-to-int-in-java
-                            int convertLongToInt = (int) elapsed;
-                            //Convert from milliseconds to minutes
-                            int timeBetweenTimeDates = convertLongToInt/60000;
-
-                            //if timestamp from database is more than 5 min older, don't add to map:
-                            if (timeBetweenTimeDates<=5)
+                            int timeBetweenDates = timeCalculator.CheckTime(vehicleLocations);
+                            //if timestamp from database is more than 5* min older, don't add to map:
+                            if (timeBetweenDates<=20)
                             {
-                                map.put(snapshot.getKey(), vehicleLocationzz);
+                                map.put(snapshot.getKey(), vehicleLocations);
                                 setUpMap();
                             }
-                            if (timeBetweenTimeDates > 5)
+                            if (timeBetweenDates > 20)
                             {
                                 map.remove(snapshot.getKey());
                                 setUpMap();
@@ -218,7 +169,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     };
-
 
 
     private void setUpMapIfNeeded() {
@@ -283,10 +233,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 geocoder = new Geocoder(this, Locale.getDefault());
                 try {
                     addresses = geocoder.getFromLocation(value.latitude, value.longitude, 1);
-                    address = addresses.get(0).getAddressLine(0);
-                    //Removing street number, postal code, city name and country:
-                    addressCorrect = address.split(",")[0];
-                    finalAddress=addressCorrect.replaceAll("[^A-Åa-å + //]", "");
+                    //Preventing program crash for unknown addresses
+                    if (!addresses.isEmpty())
+                    {
+                        address = addresses.get(0).getAddressLine(0);
+                        //Removing street number, postal code, city name and country:
+                        addressCorrect = address.split(",")[0];
+                        finalAddress = addressCorrect.replaceAll("[^A-Åa-å + //]", "");
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -324,7 +278,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 count++;
                 readEmegencyLocationALoud();
-
 
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                     NotificationChannel channel = new NotificationChannel("My Noticiation","my notification",NotificationManager.IMPORTANCE_LOW);
@@ -384,13 +337,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         double distanceEmegencyCar = distanceCalculatorAlgorithm.DistanceCalculatorAlgorithm(userLatitude, userLongitude, alarmingmap.values().iterator().next().latitude, alarmingmap.values().iterator().next().longitude);
                         int readDistance = (int)Math.round(distanceEmegencyCar);
 
-                        //På dansk:
-                        String saySomething = "Vær opmærksom på "+ alarmingmap.values().iterator().next().vehicleType + " ved " + finalAddress + " om " + readDistance + " meter";
-
-                        /** På engelsk:
-                        String saySomething = "Beware of the "+ alarmingmap.values().iterator().next().vehicleType + " at " + finalAddress + " at " + readDistance + " meters"; */
-
-                        textToSpeech.speak(saySomething, TextToSpeech.QUEUE_ADD, null);
+                        String speakAloud;
+                        if (finalAddress == null)
+                        {
+                            //Ved en ukendt adresse
+                            String saySomething = "Vær opmærksom på "+ alarmingmap.values().iterator().next().vehicleType + " om " + readDistance + " meter";
+                            speakAloud = saySomething;
+                        }
+                        else{
+                            //Ved en kendt adresse
+                            String saySomething = "Vær opmærksom på "+ alarmingmap.values().iterator().next().vehicleType + " ved " + finalAddress + " om " + readDistance + " meter";
+                            speakAloud = saySomething;
+                        }
+                        textToSpeech.speak(speakAloud, TextToSpeech.QUEUE_ADD, null);
                         count++;
                     }
                 }
@@ -437,7 +396,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationUpdateReceiver);
     }
 
-
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
@@ -472,7 +430,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             startActivity(new Intent(MapsActivity.this, LoginActivity.class));
         }
         if(id == R.id.item_Settings){
-            startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
+            Intent radiusIntent = new Intent(MapsActivity.this, SettingsActivity.class);
+            radiusIntent.putExtra("RadiusIntent", radius);
+            startActivity(radiusIntent);
+            //startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

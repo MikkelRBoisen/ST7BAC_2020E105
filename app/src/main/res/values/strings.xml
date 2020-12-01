@@ -19,7 +19,7 @@
 
 
     <!--SettingsActivity strings-->
-    <string name="textView_volume">Alarm volume</string>
+    <string name="textView_volume">Lydniveau</string>
     <string name="textView_radius">Radius</string>
     <string name="safe_button">Gem ændringer</string>
 
@@ -42,8 +42,25 @@
 
     <!--LoginActivity strings-->
     <string name="AuthenticationFailedToast">Authentication failed</string>
+    <string name="loginInfoText">Login til beredskabet</string>
+    <string name="username">Brugernavn</string>
+    <string name="password">Adgangskode</string>
+    <string name="loginBtn">Log ind</string>
 
 
+    <!--MainActivity strings-->
+    <string name="startBeware">Start Beware</string>
 
+    <!--MapsActivity strings-->
+    <string name="maps">Kort</string>
+
+
+    <!--Spinner_Layout strings-->
+    <string name="chooseVehicleType">Vælg køretøj</string>
+
+    <!--Dropdown menu strings-->
+    <string name="settings">Indstillinger</string>
+    <string name="login">Beredskabs login</string>
+    <string name="logout">Log ud</string>
 
 </resources>

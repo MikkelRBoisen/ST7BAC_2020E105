@@ -1,5 +1,6 @@
 package com.example.st7bac_2020e105.Activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -9,8 +10,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.ContactsContract;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,18 +25,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class EmergencyVehicleLocationActivity extends AppCompatActivity implements View.OnClickListener {
 
-    //Button: Inspired by https://www.youtube.com/watch?v=Nn4-Vn7qk9k&t=6s&ab_channel=CodinginFlow
-    // and https://stackoverflow.com/questions/34259618/android-using-imageview-onclick-to-change-image-back-and-forth
-
-    //https://www.youtube.com/watch?v=hyi4dLyPtpI&t=2443s&ab_channel=ProgrammerWorld
-
+    //Inspired by:
+    // https://www.youtube.com/watch?v=Nn4-Vn7qk9k&t=6s&ab_channel=CodinginFlow
+    // https://stackoverflow.com/questions/34259618/android-using-imageview-onclick-to-change-image-back-and-forth
+    // https://www.youtube.com/watch?v=hyi4dLyPtpI&t=2443s&ab_channel=ProgrammerWorld
 
     private DatabaseReference databaseReference;
 
@@ -57,7 +56,6 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     private String vehicleType;
 
     private FirebaseAuth auth = FirebaseAuth.getInstance();
-    Button logOut;
 
     public String username;
 
@@ -80,7 +78,6 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         String email = auth.getCurrentUser().getEmail().toString();
         username = email.substring(0, email.lastIndexOf("@"));
 
-        logOut = (Button)findViewById(R.id.btn_logOut);
 
         infoText = findViewById(R.id.txt_info_emergencyvehiclelocation);
         lati = (TextView) findViewById(R.id.txtLat);
@@ -89,25 +86,16 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         mapImage = (ImageView)findViewById(R.id.img_staticMaps);
         mapImage.setImageResource(R.drawable.hiclipart);
 
-
         Intent data = getIntent();
         vehicleType = getIntent().getStringExtra("Vehicle");
         if (data.hasExtra(MainActivity.EXTRA_USER_LONGITUDE) && data.hasExtra(MainActivity.EXTRA_USER_LATITUDE)) {
             userLatitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LATITUDE, 0);
             userLongitude = data.getDoubleExtra(MainActivity.EXTRA_USER_LONGITUDE, 0);
         }
-
-        logOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                auth.signOut();
-                Toast.makeText(EmergencyVehicleLocationActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        });
     }
 
 
+    // Start and stop an emergency on button click
     @Override
     public void onClick(View v) {
         if (v == startStopLocation) {
@@ -142,7 +130,6 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
             public void run() {
                 position++;
                 if (position >= image.length)
-
                     position = 0;
                     mapImage.setImageResource(image[position]);
             }
@@ -153,6 +140,7 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
         this.timer.cancel();
     }
 
+    // Write to database using a BroadcastReceiver
     BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent data) {
@@ -189,5 +177,26 @@ public class EmergencyVehicleLocationActivity extends AppCompatActivity implemen
     protected void onPause() {
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(locationUpdateReceiver);
+    }
+
+    //creating menu with log out
+    //inflating menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.emegency_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    //Menu item selected
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        //get item id
+        int id = item.getItemId();
+        if (id == R.id.logOut){
+            auth.signOut();
+            Toast.makeText(EmergencyVehicleLocationActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -2,11 +2,7 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/item_Settings"
-        android:title="@string/settings"
-        />
-    <item
-        android:id="@+id/item_Beredskabslogin"
-        android:title="@string/login"
+        android:id="@+id/logOut"
+        android:title="@string/logout"
         />
 </menu>

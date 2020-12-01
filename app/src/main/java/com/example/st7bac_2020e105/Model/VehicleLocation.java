@@ -1,13 +1,5 @@
 package com.example.st7bac_2020e105.Model;
 
-import com.google.type.DateTime;
-
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Inspired by "TheArnieExerciseFinder" model class
  */
@@ -30,7 +22,6 @@ public class VehicleLocation {
         this.userId = userId;
         this.timestamp = timestamp;
     }
-
 
     public double getLatitude() {
         return latitude;

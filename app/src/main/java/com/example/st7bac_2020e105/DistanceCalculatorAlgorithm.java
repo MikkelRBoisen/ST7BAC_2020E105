@@ -2,7 +2,6 @@ package com.example.st7bac_2020e105;
 
 public class DistanceCalculatorAlgorithm {
 
-
     //Inspired by http://www.movable-type.co.uk/scripts/latlong.html?from=49.243824,-121.887340&to=49.235347,-121.92532
 
     public double DistanceCalculatorAlgorithm(double myLat, double myLong, double emergencyLat, double emergencyLong)
@@ -29,9 +28,4 @@ public class DistanceCalculatorAlgorithm {
         double d = (earthRadius*c)*1000;
         return d;
     }
-
-
-
-
-
 }
