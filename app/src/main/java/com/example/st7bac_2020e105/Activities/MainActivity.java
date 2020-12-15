@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             isTracking = true;
             return true;
         } catch (Exception ex) {
-            //things can go wrong
+            //if app crashes
             Log.e("TRACKER", "Error during start", ex);
             return false;
         }
@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void broadcastLocationUpdate(Location location){
+        //broadcast if new location
         Intent update = new Intent("LOCATION_UPDATE");
         update.putExtra(EXTRA_USER_LATITUDE, location.getLatitude());
         update.putExtra(EXTRA_USER_LONGITUDE, location.getLongitude());
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
+            //broadcast if new location
             userLocation = location;
             updateStatus();
             broadcastLocationUpdate(location);

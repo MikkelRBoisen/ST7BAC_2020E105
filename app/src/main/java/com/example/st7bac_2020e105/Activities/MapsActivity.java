@@ -125,18 +125,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                         VehicleLocation vehicleLocations;
                         vehicleLocations = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
                         try {
                             int timeBetweenDates = timeCalculator.CheckTime(vehicleLocations);
                             //if timestamp from database is more than 5* min older, don't add to map:
-                            if (timeBetweenDates<=20)
+                            if (timeBetweenDates<=5)
                             {
                                 map.put(snapshot.getKey(), vehicleLocations);
                                 setUpMap();
                             }
-                            if (timeBetweenDates > 20)
+                            if (timeBetweenDates > 5)
                             {
                                 map.remove(snapshot.getKey());
                                 setUpMap();
@@ -245,7 +244,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     e.printStackTrace();
                 }
 
-                //Calculating distance between users location and emergency vehicles
+                //Calculating distance between users location and emergency vehicles - the implemented method in android.
 //                float[] results = new float[1];
 //                Location.distanceBetween(userLatitude,userLongitude,value.latitude,value.longitude,results);
 //                float distance = results[0];
@@ -428,12 +427,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         int id = item.getItemId();
         if (id == R.id.item_Beredskabslogin){
             startActivity(new Intent(MapsActivity.this, LoginActivity.class));
+            finish();
         }
         if(id == R.id.item_Settings){
             Intent radiusIntent = new Intent(MapsActivity.this, SettingsActivity.class);
             radiusIntent.putExtra("RadiusIntent", radius);
             startActivity(radiusIntent);
-            finish();
             //startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);

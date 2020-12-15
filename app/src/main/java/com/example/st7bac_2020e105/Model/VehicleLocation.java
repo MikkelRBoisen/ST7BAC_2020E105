@@ -1,9 +1,5 @@
 package com.example.st7bac_2020e105.Model;
 
-/**
- * Inspired by "TheArnieExerciseFinder" model class
- */
-
 public class VehicleLocation {
 
     public double latitude;

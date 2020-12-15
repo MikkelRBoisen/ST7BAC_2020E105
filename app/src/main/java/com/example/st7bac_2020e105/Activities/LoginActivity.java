@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
     }
 
     private void loginUser(String email, String passw, final String vehicle) {
-        // Viser progress dialog
+        // show progress dialog
         pd.setMessage("Logging In...");
         pd.show();
         mAuth.signInWithEmailAndPassword(email, passw)

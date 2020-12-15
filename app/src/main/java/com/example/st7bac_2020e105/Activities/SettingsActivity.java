@@ -17,7 +17,7 @@ import com.example.st7bac_2020e105.R;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    //Inspiration fra:
+    //Inspiration from:
     //https://www.youtube.com/watch?v=KAx5OAld8Hg&t=301s&ab_channel=WithSam
 
     Button safeButton;
