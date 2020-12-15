@@ -125,18 +125,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                         VehicleLocation vehicleLocations;
                         vehicleLocations = snapshot.getChildren().iterator().next().getValue(VehicleLocation.class);
                         try {
                             int timeBetweenDates = timeCalculator.CheckTime(vehicleLocations);
                             //if timestamp from database is more than 5* min older, don't add to map:
-                            if (timeBetweenDates<=20)
+                            if (timeBetweenDates<=5)
                             {
                                 map.put(snapshot.getKey(), vehicleLocations);
                                 setUpMap();
                             }
-                            if (timeBetweenDates > 20)
+                            if (timeBetweenDates > 5)
                             {
                                 map.remove(snapshot.getKey());
                                 setUpMap();
@@ -428,6 +427,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         int id = item.getItemId();
         if (id == R.id.item_Beredskabslogin){
             startActivity(new Intent(MapsActivity.this, LoginActivity.class));
+            finish();
         }
         if(id == R.id.item_Settings){
             Intent radiusIntent = new Intent(MapsActivity.this, SettingsActivity.class);
