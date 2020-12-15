@@ -433,6 +433,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Intent radiusIntent = new Intent(MapsActivity.this, SettingsActivity.class);
             radiusIntent.putExtra("RadiusIntent", radius);
             startActivity(radiusIntent);
+            finish();
             //startActivity(new Intent(MapsActivity.this, SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);

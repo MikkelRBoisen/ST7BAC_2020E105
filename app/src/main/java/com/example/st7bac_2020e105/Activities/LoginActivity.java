@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements AdapterView.OnIt
         automatiskLoginKnap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                username.setText("test");
+                username.setText("brandbil1");
                 password.setText("123456789");
             }
         });
